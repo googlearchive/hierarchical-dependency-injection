@@ -1,0 +1,132 @@
+{
+  "ngDeps": {
+    "1": "",
+    "3": [
+      {
+        "1": "package:angular2/core.dart",
+        "5": false
+      },
+      {
+        "1": "edit_item.dart",
+        "5": false
+      },
+      {
+        "1": "hero.dart",
+        "5": false
+      },
+      {
+        "1": "hero_card_component.dart",
+        "5": false
+      },
+      {
+        "1": "hero_editor_component.dart",
+        "5": false
+      },
+      {
+        "1": "heroes_service.dart",
+        "5": false
+      }
+    ],
+    "5": [
+      {
+        "1": "HeroesListComponent",
+        "4": [
+          {
+            "1": "Component",
+            "3": [
+              {
+                "1": "selector",
+                "2": "'heroes-list'"
+              },
+              {
+                "1": "template",
+                "2": "'''\n  <div>\n      <ul>\n        <li *ngFor=\"#editItem of heroes\">\n          <hero-card\n            [hidden]=\"editItem.editing\"\n            [hero]=\"editItem.item\">\n          </hero-card>\n          <button\n            [hidden]=\"editItem.editing\"\n            (click)=\"editItem.editing = true\">\n              edit\n          </button>\n          <hero-editor\n            (saved)=\"onSaved(editItem, \\$event)\"\n            (canceled)=\"onCanceled(editItem)\"\n            [hidden]=\"!editItem.editing\"\n            [hero]=\"editItem.item\">\n          </hero-editor>\n        </li>\n      </ul>\n    </div>\n  '''"
+              },
+              {
+                "1": "directives",
+                "2": "const [HeroCardComponent, HeroEditorComponent]"
+              }
+            ],
+            "4": false,
+            "5": true,
+            "6": true,
+            "7": true,
+            "8": false
+          }
+        ],
+        "5": [
+          {
+            "1": "HeroesService",
+            "4": "heroesService"
+          }
+        ],
+        "8": [
+          {
+            "2": "HeroCardComponent"
+          },
+          {
+            "2": "HeroEditorComponent"
+          }
+        ]
+      }
+    ],
+    "6": "heroes_list_component.dart"
+  },
+  "type": {
+    "HeroesListComponent": {
+      "class": "Directive",
+      "isComponent": true,
+      "dynamicLoadable": true,
+      "selector": "heroes-list",
+      "exportAs": null,
+      "type": {
+        "class": "Type",
+        "name": "HeroesListComponent",
+        "moduleUrl": "asset:hierarchical_di/lib/heroes_list_component.dart",
+        "prefix": null,
+        "isHost": false,
+        "constConstructor": null,
+        "value": null,
+        "diDeps": [
+          {
+            "token": {
+              "class": "Identifier",
+              "name": "HeroesService",
+              "moduleUrl": null,
+              "prefix": null,
+              "constConstructor": null,
+              "value": null
+            },
+            "query": null,
+            "viewQuery": null,
+            "isAttribute": false,
+            "isSelf": false,
+            "isHost": false,
+            "isSkipSelf": false,
+            "isOptional": false
+          }
+        ]
+      },
+      "changeDetection": 5,
+      "inputs": {},
+      "outputs": {},
+      "hostListeners": {},
+      "hostProperties": {},
+      "hostAttributes": {},
+      "lifecycleHooks": [],
+      "template": {
+        "encapsulation": 2,
+        "template": "  <div>\n      <ul>\n        <li *ngFor=\"#editItem of heroes\">\n          <hero-card\n            [hidden]=\"editItem.editing\"\n            [hero]=\"editItem.item\">\n          </hero-card>\n          <button\n            [hidden]=\"editItem.editing\"\n            (click)=\"editItem.editing = true\">\n              edit\n          </button>\n          <hero-editor\n            (saved)=\"onSaved(editItem, $event)\"\n            (canceled)=\"onCanceled(editItem)\"\n            [hidden]=\"!editItem.editing\"\n            [hero]=\"editItem.item\">\n          </hero-editor>\n        </li>\n      </ul>\n    </div>\n  ",
+        "templateUrl": "asset:hierarchical_di/lib/heroes_list_component.dart",
+        "styles": [],
+        "styleUrls": [],
+        "ngContentSelectors": []
+      },
+      "providers": [],
+      "viewProviders": [],
+      "queries": [],
+      "viewQueries": []
+    }
+  },
+  "alias": {}
+}

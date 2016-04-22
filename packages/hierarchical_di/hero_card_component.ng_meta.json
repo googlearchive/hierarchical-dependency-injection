@@ -1,0 +1,107 @@
+{
+  "ngDeps": {
+    "1": "",
+    "3": [
+      {
+        "1": "package:angular2/core.dart",
+        "5": false
+      },
+      {
+        "1": "hero.dart",
+        "5": false
+      }
+    ],
+    "5": [
+      {
+        "1": "HeroCardComponent",
+        "4": [
+          {
+            "1": "Component",
+            "3": [
+              {
+                "1": "selector",
+                "2": "'hero-card'"
+              },
+              {
+                "1": "template",
+                "2": "'''\n  <div>\n    <span>Name:</span>\n    <span>{{hero.name}}</span>\n  </div>\n  '''"
+              }
+            ],
+            "4": false,
+            "5": true,
+            "6": true,
+            "7": true,
+            "8": false
+          }
+        ],
+        "7": [
+          {
+            "1": "hero",
+            "2": [
+              {
+                "1": "Input",
+                "4": false,
+                "5": false,
+                "6": false,
+                "7": false,
+                "8": false
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "6": "hero_card_component.dart",
+    "10": [
+      {
+        "1": "package:angular2/core.template.dart",
+        "4": "i0"
+      },
+      {
+        "1": "hero.template.dart",
+        "4": "i1"
+      }
+    ]
+  },
+  "type": {
+    "HeroCardComponent": {
+      "class": "Directive",
+      "isComponent": true,
+      "dynamicLoadable": true,
+      "selector": "hero-card",
+      "exportAs": null,
+      "type": {
+        "class": "Type",
+        "name": "HeroCardComponent",
+        "moduleUrl": "asset:hierarchical_di/lib/hero_card_component.dart",
+        "prefix": null,
+        "isHost": false,
+        "constConstructor": null,
+        "value": null,
+        "diDeps": []
+      },
+      "changeDetection": 5,
+      "inputs": {
+        "hero": "hero"
+      },
+      "outputs": {},
+      "hostListeners": {},
+      "hostProperties": {},
+      "hostAttributes": {},
+      "lifecycleHooks": [],
+      "template": {
+        "encapsulation": 2,
+        "template": "  <div>\n    <span>Name:</span>\n    <span>{{hero.name}}</span>\n  </div>\n  ",
+        "templateUrl": "asset:hierarchical_di/lib/hero_card_component.dart",
+        "styles": [],
+        "styleUrls": [],
+        "ngContentSelectors": []
+      },
+      "providers": [],
+      "viewProviders": [],
+      "queries": [],
+      "viewQueries": []
+    }
+  },
+  "alias": {}
+}
