@@ -6,7 +6,6 @@
       "name": "EditItem",
       "moduleUrl": "asset:hierarchical_di/lib/edit_item.dart",
       "prefix": null,
-      "constConstructor": null,
       "value": null
     }
   },

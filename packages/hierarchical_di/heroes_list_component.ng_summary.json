@@ -30,37 +30,13 @@
     "5": [
       {
         "1": "HeroesListComponent",
-        "4": [
-          {
-            "1": "Component",
-            "3": [
-              {
-                "1": "selector",
-                "2": "'heroes-list'"
-              },
-              {
-                "1": "template",
-                "2": "'''\n  <div>\n      <ul>\n        <li *ngFor=\"#editItem of heroes\">\n          <hero-card\n            [hidden]=\"editItem.editing\"\n            [hero]=\"editItem.item\">\n          </hero-card>\n          <button\n            [hidden]=\"editItem.editing\"\n            (click)=\"editItem.editing = true\">\n              edit\n          </button>\n          <hero-editor\n            (saved)=\"onSaved(editItem, \\$event)\"\n            (canceled)=\"onCanceled(editItem)\"\n            [hidden]=\"!editItem.editing\"\n            [hero]=\"editItem.item\">\n          </hero-editor>\n        </li>\n      </ul>\n    </div>\n  '''"
-              },
-              {
-                "1": "directives",
-                "2": "const [HeroCardComponent, HeroEditorComponent]"
-              }
-            ],
-            "4": false,
-            "5": true,
-            "6": true,
-            "7": true,
-            "8": false
-          }
-        ],
         "5": [
           {
             "1": "HeroesService",
             "4": "heroesService"
           }
         ],
-        "8": [
+        "7": [
           {
             "2": "HeroCardComponent"
           },
@@ -76,7 +52,6 @@
     "HeroesListComponent": {
       "class": "Directive",
       "isComponent": true,
-      "dynamicLoadable": true,
       "selector": "heroes-list",
       "exportAs": null,
       "type": {
@@ -85,25 +60,29 @@
         "moduleUrl": "asset:hierarchical_di/lib/heroes_list_component.dart",
         "prefix": null,
         "isHost": false,
-        "constConstructor": null,
         "value": null,
         "diDeps": [
           {
             "token": {
-              "class": "Identifier",
-              "name": "HeroesService",
-              "moduleUrl": null,
-              "prefix": null,
-              "constConstructor": null,
-              "value": null
+              "value": null,
+              "identifier": {
+                "class": "Identifier",
+                "name": "HeroesService",
+                "moduleUrl": null,
+                "prefix": null,
+                "value": null
+              },
+              "identifierIsInstance": false
             },
             "query": null,
             "viewQuery": null,
+            "value": null,
             "isAttribute": false,
             "isSelf": false,
             "isHost": false,
             "isSkipSelf": false,
-            "isOptional": false
+            "isOptional": false,
+            "isValue": false
           }
         ]
       },
@@ -116,7 +95,7 @@
       "lifecycleHooks": [],
       "template": {
         "encapsulation": 2,
-        "template": "  <div>\n      <ul>\n        <li *ngFor=\"#editItem of heroes\">\n          <hero-card\n            [hidden]=\"editItem.editing\"\n            [hero]=\"editItem.item\">\n          </hero-card>\n          <button\n            [hidden]=\"editItem.editing\"\n            (click)=\"editItem.editing = true\">\n              edit\n          </button>\n          <hero-editor\n            (saved)=\"onSaved(editItem, $event)\"\n            (canceled)=\"onCanceled(editItem)\"\n            [hidden]=\"!editItem.editing\"\n            [hero]=\"editItem.item\">\n          </hero-editor>\n        </li>\n      </ul>\n    </div>\n  ",
+        "template": "  <div>\n      <ul>\n        <li *ngFor=\"let editItem of heroes\">\n          <hero-card\n            [hidden]=\"editItem.editing\"\n            [hero]=\"editItem.item\">\n          </hero-card>\n          <button\n            [hidden]=\"editItem.editing\"\n            (click)=\"editItem.editing = true\">\n              edit\n          </button>\n          <hero-editor\n            (saved)=\"onSaved(editItem, $event)\"\n            (canceled)=\"onCanceled(editItem)\"\n            [hidden]=\"!editItem.editing\"\n            [hero]=\"editItem.item\">\n          </hero-editor>\n        </li>\n      </ul>\n    </div>\n  ",
         "templateUrl": "asset:hierarchical_di/lib/heroes_list_component.dart",
         "styles": [],
         "styleUrls": [],

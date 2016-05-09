@@ -13,42 +13,7 @@
     ],
     "5": [
       {
-        "1": "HeroCardComponent",
-        "4": [
-          {
-            "1": "Component",
-            "3": [
-              {
-                "1": "selector",
-                "2": "'hero-card'"
-              },
-              {
-                "1": "template",
-                "2": "'''\n  <div>\n    <span>Name:</span>\n    <span>{{hero.name}}</span>\n  </div>\n  '''"
-              }
-            ],
-            "4": false,
-            "5": true,
-            "6": true,
-            "7": true,
-            "8": false
-          }
-        ],
-        "7": [
-          {
-            "1": "hero",
-            "2": [
-              {
-                "1": "Input",
-                "4": false,
-                "5": false,
-                "6": false,
-                "7": false,
-                "8": false
-              }
-            ]
-          }
-        ]
+        "1": "HeroCardComponent"
       }
     ],
     "6": "hero_card_component.dart"
@@ -57,7 +22,6 @@
     "HeroCardComponent": {
       "class": "Directive",
       "isComponent": true,
-      "dynamicLoadable": true,
       "selector": "hero-card",
       "exportAs": null,
       "type": {
@@ -66,7 +30,6 @@
         "moduleUrl": "asset:hierarchical_di/lib/hero_card_component.dart",
         "prefix": null,
         "isHost": false,
-        "constConstructor": null,
         "value": null,
         "diDeps": []
       },

@@ -18,92 +18,27 @@
     "5": [
       {
         "1": "HeroEditorComponent",
-        "4": [
-          {
-            "1": "Component",
-            "3": [
-              {
-                "1": "selector",
-                "2": "'hero-editor'"
-              },
-              {
-                "1": "providers",
-                "2": "const [RestoreService]"
-              },
-              {
-                "1": "template",
-                "2": "'''\n  <div>\n    <span>Name:</span>\n    <input [(ngModel)]=\"hero.name\"/>\n    <div>\n      <button (click)=\"onSaved()\">save</button>\n      <button (click)=\"onCanceled()\">cancel</button>\n    </div>\n  </div>\n  '''"
-              }
-            ],
-            "4": false,
-            "5": true,
-            "6": true,
-            "7": true,
-            "8": false
-          }
-        ],
         "5": [
           {
             "1": "RestoreService",
             "2": "<Hero>",
             "4": "_restoreService"
           }
-        ],
-        "7": [
-          {
-            "1": "canceled",
-            "2": [
-              {
-                "1": "Output",
-                "4": false,
-                "5": false,
-                "6": false,
-                "7": false,
-                "8": false
-              }
-            ]
-          },
-          {
-            "1": "saved",
-            "2": [
-              {
-                "1": "Output",
-                "4": false,
-                "5": false,
-                "6": false,
-                "7": false,
-                "8": false
-              }
-            ]
-          },
-          {
-            "1": "hero",
-            "2": [
-              {
-                "1": "Input",
-                "4": false,
-                "5": false,
-                "6": false,
-                "7": false,
-                "8": false
-              }
-            ]
-          }
         ]
       }
     ],
     "6": "hero_editor_component.dart",
-    "10": [
+    "7": [
       {
-        "1": "package:angular2/core.template.dart",
+        "1": "package:angular2/core.ngfactory.dart",
         "4": "i0"
       },
       {
-        "1": "hero.template.dart",
+        "1": "hero.ngfactory.dart",
         "4": "i1"
       },
       {
-        "1": "restore_service.template.dart",
+        "1": "restore_service.ngfactory.dart",
         "4": "i2"
       }
     ]
@@ -112,7 +47,6 @@
     "HeroEditorComponent": {
       "class": "Directive",
       "isComponent": true,
-      "dynamicLoadable": true,
       "selector": "hero-editor",
       "exportAs": null,
       "type": {
@@ -121,25 +55,29 @@
         "moduleUrl": "asset:hierarchical_di/lib/hero_editor_component.dart",
         "prefix": null,
         "isHost": false,
-        "constConstructor": null,
         "value": null,
         "diDeps": [
           {
             "token": {
-              "class": "Identifier",
-              "name": "RestoreService",
-              "moduleUrl": "asset:hierarchical_di/lib/restore_service.dart",
-              "prefix": null,
-              "constConstructor": null,
-              "value": null
+              "value": null,
+              "identifier": {
+                "class": "Identifier",
+                "name": "RestoreService",
+                "moduleUrl": "asset:hierarchical_di/lib/restore_service.dart",
+                "prefix": null,
+                "value": null
+              },
+              "identifierIsInstance": false
             },
             "query": null,
             "viewQuery": null,
+            "value": null,
             "isAttribute": false,
             "isSelf": false,
             "isHost": false,
             "isSkipSelf": false,
-            "isOptional": false
+            "isOptional": false,
+            "isValue": false
           }
         ]
       },
@@ -167,14 +105,17 @@
         {
           "class": "Provider",
           "token": {
-            "class": "Type",
-            "name": "RestoreService",
-            "moduleUrl": "asset:hierarchical_di/lib/restore_service.dart",
-            "prefix": null,
-            "isHost": false,
-            "constConstructor": null,
             "value": null,
-            "diDeps": []
+            "identifier": {
+              "class": "Type",
+              "name": "RestoreService",
+              "moduleUrl": "asset:hierarchical_di/lib/restore_service.dart",
+              "prefix": null,
+              "isHost": false,
+              "value": null,
+              "diDeps": []
+            },
+            "identifierIsInstance": false
           },
           "useClass": {
             "class": "Type",
@@ -182,13 +123,14 @@
             "moduleUrl": "asset:hierarchical_di/lib/restore_service.dart",
             "prefix": null,
             "isHost": false,
-            "constConstructor": null,
             "value": null,
             "diDeps": []
           },
           "useExisting": null,
           "useValue": null,
-          "useFactory": null
+          "useFactory": null,
+          "multi": false,
+          "deps": null
         }
       ],
       "viewProviders": [],

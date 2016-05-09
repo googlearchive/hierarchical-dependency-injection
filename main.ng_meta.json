@@ -16,17 +16,17 @@
       }
     ],
     "6": "main.dart",
-    "10": [
+    "7": [
       {
-        "1": "package:angular2/platform/browser_static.template.dart",
+        "1": "package:angular2/platform/browser_static.ngfactory.dart",
         "4": "i0"
       },
       {
-        "1": "package:hierarchical_di/heroes_list_component.template.dart",
+        "1": "package:hierarchical_di/heroes_list_component.ngfactory.dart",
         "4": "i1"
       },
       {
-        "1": "package:hierarchical_di/heroes_service.template.dart",
+        "1": "package:hierarchical_di/heroes_service.ngfactory.dart",
         "4": "i2"
       }
     ]
@@ -37,7 +37,6 @@
       "name": "main",
       "moduleUrl": "asset:hierarchical_di/web/main.dart",
       "prefix": null,
-      "constConstructor": null,
       "value": null
     }
   },

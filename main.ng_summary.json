@@ -23,7 +23,6 @@
       "name": "main",
       "moduleUrl": "asset:hierarchical_di/web/main.dart",
       "prefix": null,
-      "constConstructor": null,
       "value": null
     }
   },
