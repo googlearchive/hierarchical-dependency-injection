@@ -30,15 +30,15 @@
     "6": "hero_editor_component.dart",
     "7": [
       {
-        "1": "package:angular2/core.ngfactory.dart",
+        "1": "package:angular2/core.template.dart",
         "4": "i0"
       },
       {
-        "1": "hero.ngfactory.dart",
+        "1": "hero.template.dart",
         "4": "i1"
       },
       {
-        "1": "restore_service.ngfactory.dart",
+        "1": "restore_service.template.dart",
         "4": "i2"
       }
     ]
@@ -129,6 +129,7 @@
           "useExisting": null,
           "useValue": null,
           "useFactory": null,
+          "useProperty": null,
           "multi": false,
           "deps": null
         }
