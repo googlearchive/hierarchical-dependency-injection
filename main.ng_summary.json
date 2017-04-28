@@ -7,11 +7,7 @@
         "5": false
       },
       {
-        "1": "package:hierarchical_di/heroes_list_component.dart",
-        "5": false
-      },
-      {
-        "1": "package:hierarchical_di/heroes_service.dart",
+        "1": "package:hierarchical_di/app_component.dart",
         "5": false
       }
     ],

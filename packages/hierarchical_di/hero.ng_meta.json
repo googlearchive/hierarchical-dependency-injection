@@ -7,6 +7,13 @@
       "moduleUrl": "asset:hierarchical_di/lib/hero.dart",
       "prefix": null,
       "value": null
+    },
+    "HeroTaxReturn": {
+      "class": "Identifier",
+      "name": "HeroTaxReturn",
+      "moduleUrl": "asset:hierarchical_di/lib/hero.dart",
+      "prefix": null,
+      "value": null
     }
   },
   "alias": {}
