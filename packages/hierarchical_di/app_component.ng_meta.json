@@ -3,7 +3,7 @@
     "1": "",
     "3": [
       {
-        "1": "package:angular2/core.dart",
+        "1": "package:angular2/angular2.dart",
         "5": false
       },
       {
@@ -28,6 +28,9 @@
         "1": "AppComponent",
         "7": [
           {
+            "2": "CORE_DIRECTIVES"
+          },
+          {
             "2": "carComponents"
           },
           {
@@ -42,7 +45,7 @@
     "6": "app_component.dart",
     "7": [
       {
-        "1": "package:angular2/core.template.dart",
+        "1": "package:angular2/angular2.template.dart",
         "4": "i0"
       },
       {

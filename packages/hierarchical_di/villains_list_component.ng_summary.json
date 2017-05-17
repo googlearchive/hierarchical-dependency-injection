@@ -7,7 +7,7 @@
         "5": false
       },
       {
-        "1": "package:angular2/core.dart",
+        "1": "package:angular2/angular2.dart",
         "5": false
       },
       {
@@ -22,6 +22,16 @@
           {
             "1": "VillainsService",
             "4": "_villainsService"
+          }
+        ],
+        "7": [
+          {
+            "2": "CORE_DIRECTIVES"
+          }
+        ],
+        "8": [
+          {
+            "2": "COMMON_PIPES"
           }
         ]
       }

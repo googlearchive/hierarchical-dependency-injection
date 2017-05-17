@@ -7,7 +7,7 @@
         "5": false
       },
       {
-        "1": "package:angular2/core.dart",
+        "1": "package:angular2/angular2.dart",
         "5": false
       },
       {
@@ -26,6 +26,11 @@
           {
             "1": "HeroTaxReturnService",
             "4": "_heroTaxReturnService"
+          }
+        ],
+        "7": [
+          {
+            "2": "COMMON_DIRECTIVES"
           }
         ]
       }

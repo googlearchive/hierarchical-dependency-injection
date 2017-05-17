@@ -7,7 +7,7 @@
         "5": false
       },
       {
-        "1": "package:angular2/core.dart",
+        "1": "package:angular2/angular2.dart",
         "5": false
       },
       {
@@ -34,7 +34,15 @@
         ],
         "7": [
           {
+            "2": "CORE_DIRECTIVES"
+          },
+          {
             "2": "HeroTaxReturnComponent"
+          }
+        ],
+        "8": [
+          {
+            "2": "COMMON_PIPES"
           }
         ]
       }
@@ -42,7 +50,7 @@
     "6": "heroes_list_component.dart",
     "7": [
       {
-        "1": "package:angular2/core.template.dart",
+        "1": "package:angular2/angular2.template.dart",
         "4": "i0"
       },
       {
