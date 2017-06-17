@@ -7,19 +7,19 @@
         "5": false
       },
       {
-        "1": "car_components.dart",
+        "1": "src/car_components.dart",
         "5": false
       },
       {
-        "1": "heroes_list_component.dart",
+        "1": "src/heroes_list_component.dart",
         "5": false
       },
       {
-        "1": "heroes_service.dart",
+        "1": "src/heroes_service.dart",
         "5": false
       },
       {
-        "1": "villains_list_component.dart",
+        "1": "src/villains_list_component.dart",
         "5": false
       }
     ],
@@ -69,7 +69,7 @@
       "lifecycleHooks": [],
       "template": {
         "encapsulation": 2,
-        "template": "      <label><input type=\"checkbox\" [checked]=\"showHeroes\"   (change)=\"showHeroes=!showHeroes\">Heroes</label>\n      <label><input type=\"checkbox\" [checked]=\"showVillains\" (change)=\"showVillains=!showVillains\">Villains</label>\n      <label><input type=\"checkbox\" [checked]=\"showCars\"     (change)=\"showCars=!showCars\">Cars</label>\n\n      <h1>Hierarchical Dependency Injection</h1>\n\n      <heroes-list   *ngIf=\"showHeroes\"></heroes-list>\n      <villains-list *ngIf=\"showVillains\"></villains-list>\n      <my-cars       *ngIf=\"showCars\"></my-cars>\n    ",
+        "template": "    <label><input type=\"checkbox\" [checked]=\"showHeroes\"   (change)=\"showHeroes=!showHeroes\">Heroes</label>\n    <label><input type=\"checkbox\" [checked]=\"showVillains\" (change)=\"showVillains=!showVillains\">Villains</label>\n    <label><input type=\"checkbox\" [checked]=\"showCars\"     (change)=\"showCars=!showCars\">Cars</label>\n\n    <h1>Hierarchical Dependency Injection</h1>\n\n    <heroes-list   *ngIf=\"showHeroes\"></heroes-list>\n    <villains-list *ngIf=\"showVillains\"></villains-list>\n    <my-cars       *ngIf=\"showCars\"></my-cars>\n  ",
         "templateUrl": "asset:hierarchical_di/lib/app_component.dart",
         "styles": [],
         "styleUrls": [],

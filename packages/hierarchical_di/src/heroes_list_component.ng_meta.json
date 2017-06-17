@@ -76,7 +76,7 @@
       "type": {
         "class": "Type",
         "name": "HeroesListComponent",
-        "moduleUrl": "asset:hierarchical_di/lib/heroes_list_component.dart",
+        "moduleUrl": "asset:hierarchical_di/lib/src/heroes_list_component.dart",
         "prefix": null,
         "isHost": false,
         "value": null,
@@ -87,7 +87,7 @@
               "identifier": {
                 "class": "Identifier",
                 "name": "HeroesService",
-                "moduleUrl": "asset:hierarchical_di/lib/heroes_service.dart",
+                "moduleUrl": "asset:hierarchical_di/lib/src/heroes_service.dart",
                 "prefix": null,
                 "value": null
               },
@@ -114,7 +114,7 @@
       "template": {
         "encapsulation": 0,
         "template": "      <div>\n        <h3>Hero Tax Returns</h3>\n        <ul>\n          <li *ngFor=\"let hero of heroes | async\"\n              (click)=\"showTaxReturn(hero)\">{{hero.name}}\n          </li>\n        </ul>\n        <hero-tax-return\n          *ngFor=\"let selected of selectedTaxReturns; let i = index\"\n          [taxReturn]=\"selected\"\n          (close)=\"closeTaxReturn(i)\">\n        </hero-tax-return>\n      </div>\n    ",
-        "templateUrl": "asset:hierarchical_di/lib/heroes_list_component.dart",
+        "templateUrl": "asset:hierarchical_di/lib/src/heroes_list_component.dart",
         "styles": [
           "li {cursor: pointer;}"
         ],

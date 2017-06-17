@@ -60,7 +60,7 @@
       "type": {
         "class": "Type",
         "name": "HeroTaxReturnComponent",
-        "moduleUrl": "asset:hierarchical_di/lib/hero_tax_return_component.dart",
+        "moduleUrl": "asset:hierarchical_di/lib/src/hero_tax_return_component.dart",
         "prefix": null,
         "isHost": false,
         "value": null,
@@ -71,7 +71,7 @@
               "identifier": {
                 "class": "Identifier",
                 "name": "HeroTaxReturnService",
-                "moduleUrl": "asset:hierarchical_di/lib/hero_tax_return_service.dart",
+                "moduleUrl": "asset:hierarchical_di/lib/src/hero_tax_return_service.dart",
                 "prefix": null,
                 "value": null
               },
@@ -104,10 +104,10 @@
       "template": {
         "encapsulation": 0,
         "template": "      <div class=\"tax-return\">\n        <div class=\"msg\" [class.canceled]=\"message==='Canceled'\">{{message}}</div>\n        <fieldset>\n          <span  id=name>{{taxReturn.name}}</span>\n          <label id=tid>TID: {{taxReturn.taxId}}</label>\n        </fieldset>\n        <fieldset>\n          <label>\n            Income: <input type=\"number\" [(ngModel)]=\"taxReturn.income\" class=\"num\">\n          </label>\n        </fieldset>\n        <fieldset>\n          <label>Tax: {{taxReturn.tax}}</label>\n        </fieldset>\n        <fieldset>\n          <button (click)=\"onSaved()\">Save</button>\n          <button (click)=\"onCanceled()\">Cancel</button>\n          <button (click)=\"onClose()\">Close</button>\n        </fieldset>\n      </div>\n    ",
-        "templateUrl": "asset:hierarchical_di/lib/hero_tax_return_component.dart",
+        "templateUrl": "asset:hierarchical_di/lib/src/hero_tax_return_component.dart",
         "styles": [],
         "styleUrls": [
-          "asset:hierarchical_di/lib/hero_tax_return_component.css"
+          "asset:hierarchical_di/lib/src/hero_tax_return_component.css"
         ],
         "ngContentSelectors": []
       },
@@ -119,7 +119,7 @@
             "identifier": {
               "class": "Type",
               "name": "HeroTaxReturnService",
-              "moduleUrl": "asset:hierarchical_di/lib/hero_tax_return_service.dart",
+              "moduleUrl": "asset:hierarchical_di/lib/src/hero_tax_return_service.dart",
               "prefix": null,
               "isHost": false,
               "value": null,
@@ -130,7 +130,7 @@
                     "identifier": {
                       "class": "Identifier",
                       "name": "HeroesService",
-                      "moduleUrl": "asset:hierarchical_di/lib/heroes_service.dart",
+                      "moduleUrl": "asset:hierarchical_di/lib/src/heroes_service.dart",
                       "prefix": null,
                       "value": null
                     },
@@ -151,7 +151,7 @@
           "useClass": {
             "class": "Type",
             "name": "HeroTaxReturnService",
-            "moduleUrl": "asset:hierarchical_di/lib/hero_tax_return_service.dart",
+            "moduleUrl": "asset:hierarchical_di/lib/src/hero_tax_return_service.dart",
             "prefix": null,
             "isHost": false,
             "value": null,
@@ -162,7 +162,7 @@
                   "identifier": {
                     "class": "Identifier",
                     "name": "HeroesService",
-                    "moduleUrl": "asset:hierarchical_di/lib/heroes_service.dart",
+                    "moduleUrl": "asset:hierarchical_di/lib/src/heroes_service.dart",
                     "prefix": null,
                     "value": null
                   },

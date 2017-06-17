@@ -22,26 +22,20 @@
         ]
       }
     ],
-    "6": "villains_service.dart",
-    "7": [
-      {
-        "1": "package:angular2/angular2.template.dart",
-        "4": "i0"
-      }
-    ]
+    "6": "villains_service.dart"
   },
   "type": {
     "Villain": {
       "class": "Identifier",
       "name": "Villain",
-      "moduleUrl": "asset:hierarchical_di/lib/villains_service.dart",
+      "moduleUrl": "asset:hierarchical_di/lib/src/villains_service.dart",
       "prefix": null,
       "value": null
     },
     "VillainsService": {
       "class": "Type",
       "name": "VillainsService",
-      "moduleUrl": "asset:hierarchical_di/lib/villains_service.dart",
+      "moduleUrl": "asset:hierarchical_di/lib/src/villains_service.dart",
       "prefix": null,
       "isHost": false,
       "value": null,

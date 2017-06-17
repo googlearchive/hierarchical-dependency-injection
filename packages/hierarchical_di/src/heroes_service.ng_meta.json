@@ -9,11 +9,15 @@
       {
         "1": "package:angular2/angular2.dart",
         "5": false
+      },
+      {
+        "1": "hero.dart",
+        "5": false
       }
     ],
     "5": [
       {
-        "1": "VillainsService",
+        "1": "HeroesService",
         "4": [
           {
             "1": "Injectable",
@@ -22,20 +26,23 @@
         ]
       }
     ],
-    "6": "villains_service.dart"
+    "6": "heroes_service.dart",
+    "7": [
+      {
+        "1": "package:angular2/angular2.template.dart",
+        "4": "i0"
+      },
+      {
+        "1": "hero.template.dart",
+        "4": "i1"
+      }
+    ]
   },
   "type": {
-    "Villain": {
-      "class": "Identifier",
-      "name": "Villain",
-      "moduleUrl": "asset:hierarchical_di/lib/villains_service.dart",
-      "prefix": null,
-      "value": null
-    },
-    "VillainsService": {
+    "HeroesService": {
       "class": "Type",
-      "name": "VillainsService",
-      "moduleUrl": "asset:hierarchical_di/lib/villains_service.dart",
+      "name": "HeroesService",
+      "moduleUrl": "asset:hierarchical_di/lib/src/heroes_service.dart",
       "prefix": null,
       "isHost": false,
       "value": null,

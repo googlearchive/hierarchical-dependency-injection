@@ -32,7 +32,7 @@
     "HeroesService": {
       "class": "Type",
       "name": "HeroesService",
-      "moduleUrl": "asset:hierarchical_di/lib/heroes_service.dart",
+      "moduleUrl": "asset:hierarchical_di/lib/src/heroes_service.dart",
       "prefix": null,
       "isHost": false,
       "value": null,

@@ -9081,7 +9081,7 @@ t6:{"^":"v;fx,fy,go,id,k1,k2,k3,k4,r1,r2,rx,ry,x1,x2,y1,y2,a,b,c,d,e,f,r,x,y,z,Q
 q:function(){var z,y,x,w,v,u,t,s,r,q
 z=this.aN(this.r)
 y=document
-z.appendChild(y.createTextNode("      "))
+z.appendChild(y.createTextNode("    "))
 x=S.N(y,"label",z)
 this.fx=x
 x=S.N(y,"input",x)
@@ -9089,7 +9089,7 @@ this.fy=x
 J.ca(x,"type","checkbox")
 w=y.createTextNode("Heroes")
 this.fx.appendChild(w)
-z.appendChild(y.createTextNode("\n      "))
+z.appendChild(y.createTextNode("\n    "))
 x=S.N(y,"label",z)
 this.go=x
 x=S.N(y,"input",x)
@@ -9097,7 +9097,7 @@ this.id=x
 J.ca(x,"type","checkbox")
 v=y.createTextNode("Villains")
 this.go.appendChild(v)
-z.appendChild(y.createTextNode("\n      "))
+z.appendChild(y.createTextNode("\n    "))
 x=S.N(y,"label",z)
 this.k1=x
 x=S.N(y,"input",x)
@@ -9105,30 +9105,30 @@ this.k2=x
 J.ca(x,"type","checkbox")
 u=y.createTextNode("Cars")
 this.k1.appendChild(u)
-z.appendChild(y.createTextNode("\n\n      "))
+z.appendChild(y.createTextNode("\n\n    "))
 x=S.N(y,"h1",z)
 this.k3=x
 x.appendChild(y.createTextNode("Hierarchical Dependency Injection"))
-z.appendChild(y.createTextNode("\n\n      "))
+z.appendChild(y.createTextNode("\n\n    "))
 x=$.$get$eb()
 t=x.cloneNode(!1)
 z.appendChild(t)
 s=new V.co(16,null,this,t,null,null,null)
 this.k4=s
 this.r1=new K.d0(new D.aZ(s,V.vo()),s,!1)
-z.appendChild(y.createTextNode("\n      "))
+z.appendChild(y.createTextNode("\n    "))
 r=x.cloneNode(!1)
 z.appendChild(r)
 s=new V.co(18,null,this,r,null,null,null)
 this.r2=s
 this.rx=new K.d0(new D.aZ(s,V.vp()),s,!1)
-z.appendChild(y.createTextNode("\n      "))
+z.appendChild(y.createTextNode("\n    "))
 q=x.cloneNode(!1)
 z.appendChild(q)
 x=new V.co(20,null,this,q,null,null,null)
 this.ry=x
 this.x1=new K.d0(new D.aZ(x,V.vq()),x,!1)
-z.appendChild(y.createTextNode("\n    "))
+z.appendChild(y.createTextNode("\n  "))
 J.aR(this.fy,"change",this.aZ(this.giv()),null)
 J.aR(this.id,"change",this.aZ(this.giw()),null)
 J.aR(this.k2,"change",this.aZ(this.git()),null)

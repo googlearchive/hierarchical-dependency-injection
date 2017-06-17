@@ -79,7 +79,7 @@
       "type": {
         "class": "Type",
         "name": "ACarComponent",
-        "moduleUrl": "asset:hierarchical_di/lib/car_components.dart",
+        "moduleUrl": "asset:hierarchical_di/lib/src/car_components.dart",
         "prefix": null,
         "isHost": false,
         "value": null,
@@ -90,7 +90,7 @@
               "identifier": {
                 "class": "Identifier",
                 "name": "CarService",
-                "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+                "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
                 "prefix": null,
                 "value": null
               },
@@ -117,7 +117,7 @@
       "template": {
         "encapsulation": 2,
         "template": "      <div>A: {{description}}</div>\n      <b-car></b-car>\n    ",
-        "templateUrl": "asset:hierarchical_di/lib/car_components.dart",
+        "templateUrl": "asset:hierarchical_di/lib/src/car_components.dart",
         "styles": [],
         "styleUrls": [],
         "ngContentSelectors": []
@@ -135,7 +135,7 @@
       "type": {
         "class": "Type",
         "name": "BCarComponent",
-        "moduleUrl": "asset:hierarchical_di/lib/car_components.dart",
+        "moduleUrl": "asset:hierarchical_di/lib/src/car_components.dart",
         "prefix": null,
         "isHost": false,
         "value": null,
@@ -146,7 +146,7 @@
               "identifier": {
                 "class": "Identifier",
                 "name": "CarService",
-                "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+                "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
                 "prefix": null,
                 "value": null
               },
@@ -173,7 +173,7 @@
       "template": {
         "encapsulation": 2,
         "template": "      <div>B: {{description}}</div>\n      <c-car></c-car>\n    ",
-        "templateUrl": "asset:hierarchical_di/lib/car_components.dart",
+        "templateUrl": "asset:hierarchical_di/lib/src/car_components.dart",
         "styles": [],
         "styleUrls": [],
         "ngContentSelectors": []
@@ -186,7 +186,7 @@
             "identifier": {
               "class": "Type",
               "name": "CarService",
-              "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+              "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
               "prefix": null,
               "isHost": false,
               "value": null,
@@ -197,7 +197,7 @@
                     "identifier": {
                       "class": "Identifier",
                       "name": "EngineService",
-                      "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+                      "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
                       "prefix": null,
                       "value": null
                     },
@@ -217,7 +217,7 @@
                     "identifier": {
                       "class": "Identifier",
                       "name": "TiresService",
-                      "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+                      "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
                       "prefix": null,
                       "value": null
                     },
@@ -238,7 +238,7 @@
           "useClass": {
             "class": "Type",
             "name": "CarService2",
-            "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+            "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
             "prefix": null,
             "isHost": false,
             "value": null,
@@ -249,7 +249,7 @@
                   "identifier": {
                     "class": "Identifier",
                     "name": "EngineService",
-                    "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+                    "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
                     "prefix": null,
                     "value": null
                   },
@@ -269,7 +269,7 @@
                   "identifier": {
                     "class": "Identifier",
                     "name": "TiresService",
-                    "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+                    "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
                     "prefix": null,
                     "value": null
                   },
@@ -298,7 +298,7 @@
             "identifier": {
               "class": "Type",
               "name": "EngineService",
-              "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+              "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
               "prefix": null,
               "isHost": false,
               "value": null,
@@ -309,7 +309,7 @@
           "useClass": {
             "class": "Type",
             "name": "EngineService2",
-            "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+            "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
             "prefix": null,
             "isHost": false,
             "value": null,
@@ -334,7 +334,7 @@
       "type": {
         "class": "Type",
         "name": "CCarComponent",
-        "moduleUrl": "asset:hierarchical_di/lib/car_components.dart",
+        "moduleUrl": "asset:hierarchical_di/lib/src/car_components.dart",
         "prefix": null,
         "isHost": false,
         "value": null,
@@ -345,7 +345,7 @@
               "identifier": {
                 "class": "Identifier",
                 "name": "CarService",
-                "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+                "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
                 "prefix": null,
                 "value": null
               },
@@ -372,7 +372,7 @@
       "template": {
         "encapsulation": 2,
         "template": "<div>C: {{description}}</div>",
-        "templateUrl": "asset:hierarchical_di/lib/car_components.dart",
+        "templateUrl": "asset:hierarchical_di/lib/src/car_components.dart",
         "styles": [],
         "styleUrls": [],
         "ngContentSelectors": []
@@ -385,7 +385,7 @@
             "identifier": {
               "class": "Type",
               "name": "CarService",
-              "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+              "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
               "prefix": null,
               "isHost": false,
               "value": null,
@@ -396,7 +396,7 @@
                     "identifier": {
                       "class": "Identifier",
                       "name": "EngineService",
-                      "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+                      "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
                       "prefix": null,
                       "value": null
                     },
@@ -416,7 +416,7 @@
                     "identifier": {
                       "class": "Identifier",
                       "name": "TiresService",
-                      "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+                      "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
                       "prefix": null,
                       "value": null
                     },
@@ -437,7 +437,7 @@
           "useClass": {
             "class": "Type",
             "name": "CarService3",
-            "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+            "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
             "prefix": null,
             "isHost": false,
             "value": null,
@@ -448,7 +448,7 @@
                   "identifier": {
                     "class": "Identifier",
                     "name": "EngineService",
-                    "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+                    "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
                     "prefix": null,
                     "value": null
                   },
@@ -468,7 +468,7 @@
                   "identifier": {
                     "class": "Identifier",
                     "name": "TiresService",
-                    "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+                    "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
                     "prefix": null,
                     "value": null
                   },
@@ -503,7 +503,7 @@
       "type": {
         "class": "Type",
         "name": "CarsComponent",
-        "moduleUrl": "asset:hierarchical_di/lib/car_components.dart",
+        "moduleUrl": "asset:hierarchical_di/lib/src/car_components.dart",
         "prefix": null,
         "isHost": false,
         "value": null,
@@ -520,7 +520,7 @@
       "template": {
         "encapsulation": 2,
         "template": "      <h3>Cars</h3>\n      <a-car></a-car>\n    ",
-        "templateUrl": "asset:hierarchical_di/lib/car_components.dart",
+        "templateUrl": "asset:hierarchical_di/lib/src/car_components.dart",
         "styles": [],
         "styleUrls": [],
         "ngContentSelectors": []
@@ -533,7 +533,7 @@
     "carComponents": {
       "class": "Identifier",
       "name": "carComponents",
-      "moduleUrl": "asset:hierarchical_di/lib/car_components.dart",
+      "moduleUrl": "asset:hierarchical_di/lib/src/car_components.dart",
       "prefix": null,
       "value": [
         {
@@ -543,7 +543,7 @@
             "identifier": {
               "class": "Type",
               "name": "CarsComponent",
-              "moduleUrl": "asset:hierarchical_di/lib/car_components.dart",
+              "moduleUrl": "asset:hierarchical_di/lib/src/car_components.dart",
               "prefix": null,
               "isHost": false,
               "value": null,
@@ -554,7 +554,7 @@
           "useClass": {
             "class": "Type",
             "name": "CarsComponent",
-            "moduleUrl": "asset:hierarchical_di/lib/car_components.dart",
+            "moduleUrl": "asset:hierarchical_di/lib/src/car_components.dart",
             "prefix": null,
             "isHost": false,
             "value": null,
@@ -573,7 +573,7 @@
             "identifier": {
               "class": "Type",
               "name": "ACarComponent",
-              "moduleUrl": "asset:hierarchical_di/lib/car_components.dart",
+              "moduleUrl": "asset:hierarchical_di/lib/src/car_components.dart",
               "prefix": null,
               "isHost": false,
               "value": null,
@@ -584,7 +584,7 @@
                     "identifier": {
                       "class": "Identifier",
                       "name": "CarService",
-                      "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+                      "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
                       "prefix": null,
                       "value": null
                     },
@@ -605,7 +605,7 @@
           "useClass": {
             "class": "Type",
             "name": "ACarComponent",
-            "moduleUrl": "asset:hierarchical_di/lib/car_components.dart",
+            "moduleUrl": "asset:hierarchical_di/lib/src/car_components.dart",
             "prefix": null,
             "isHost": false,
             "value": null,
@@ -616,7 +616,7 @@
                   "identifier": {
                     "class": "Identifier",
                     "name": "CarService",
-                    "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+                    "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
                     "prefix": null,
                     "value": null
                   },
@@ -645,7 +645,7 @@
             "identifier": {
               "class": "Type",
               "name": "BCarComponent",
-              "moduleUrl": "asset:hierarchical_di/lib/car_components.dart",
+              "moduleUrl": "asset:hierarchical_di/lib/src/car_components.dart",
               "prefix": null,
               "isHost": false,
               "value": null,
@@ -656,7 +656,7 @@
                     "identifier": {
                       "class": "Identifier",
                       "name": "CarService",
-                      "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+                      "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
                       "prefix": null,
                       "value": null
                     },
@@ -677,7 +677,7 @@
           "useClass": {
             "class": "Type",
             "name": "BCarComponent",
-            "moduleUrl": "asset:hierarchical_di/lib/car_components.dart",
+            "moduleUrl": "asset:hierarchical_di/lib/src/car_components.dart",
             "prefix": null,
             "isHost": false,
             "value": null,
@@ -688,7 +688,7 @@
                   "identifier": {
                     "class": "Identifier",
                     "name": "CarService",
-                    "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+                    "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
                     "prefix": null,
                     "value": null
                   },
@@ -717,7 +717,7 @@
             "identifier": {
               "class": "Type",
               "name": "CCarComponent",
-              "moduleUrl": "asset:hierarchical_di/lib/car_components.dart",
+              "moduleUrl": "asset:hierarchical_di/lib/src/car_components.dart",
               "prefix": null,
               "isHost": false,
               "value": null,
@@ -728,7 +728,7 @@
                     "identifier": {
                       "class": "Identifier",
                       "name": "CarService",
-                      "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+                      "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
                       "prefix": null,
                       "value": null
                     },
@@ -749,7 +749,7 @@
           "useClass": {
             "class": "Type",
             "name": "CCarComponent",
-            "moduleUrl": "asset:hierarchical_di/lib/car_components.dart",
+            "moduleUrl": "asset:hierarchical_di/lib/src/car_components.dart",
             "prefix": null,
             "isHost": false,
             "value": null,
@@ -760,7 +760,7 @@
                   "identifier": {
                     "class": "Identifier",
                     "name": "CarService",
-                    "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+                    "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
                     "prefix": null,
                     "value": null
                   },
@@ -787,7 +787,7 @@
     "carServices": {
       "class": "Identifier",
       "name": "carServices",
-      "moduleUrl": "asset:hierarchical_di/lib/car_components.dart",
+      "moduleUrl": "asset:hierarchical_di/lib/src/car_components.dart",
       "prefix": null,
       "value": [
         {
@@ -797,7 +797,7 @@
             "identifier": {
               "class": "Type",
               "name": "CarService",
-              "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+              "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
               "prefix": null,
               "isHost": false,
               "value": null,
@@ -808,7 +808,7 @@
                     "identifier": {
                       "class": "Identifier",
                       "name": "EngineService",
-                      "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+                      "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
                       "prefix": null,
                       "value": null
                     },
@@ -828,7 +828,7 @@
                     "identifier": {
                       "class": "Identifier",
                       "name": "TiresService",
-                      "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+                      "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
                       "prefix": null,
                       "value": null
                     },
@@ -849,7 +849,7 @@
           "useClass": {
             "class": "Type",
             "name": "CarService",
-            "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+            "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
             "prefix": null,
             "isHost": false,
             "value": null,
@@ -860,7 +860,7 @@
                   "identifier": {
                     "class": "Identifier",
                     "name": "EngineService",
-                    "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+                    "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
                     "prefix": null,
                     "value": null
                   },
@@ -880,7 +880,7 @@
                   "identifier": {
                     "class": "Identifier",
                     "name": "TiresService",
-                    "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+                    "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
                     "prefix": null,
                     "value": null
                   },
@@ -909,7 +909,7 @@
             "identifier": {
               "class": "Type",
               "name": "EngineService",
-              "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+              "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
               "prefix": null,
               "isHost": false,
               "value": null,
@@ -920,7 +920,7 @@
           "useClass": {
             "class": "Type",
             "name": "EngineService",
-            "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+            "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
             "prefix": null,
             "isHost": false,
             "value": null,
@@ -939,7 +939,7 @@
             "identifier": {
               "class": "Type",
               "name": "TiresService",
-              "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+              "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
               "prefix": null,
               "isHost": false,
               "value": null,
@@ -950,7 +950,7 @@
           "useClass": {
             "class": "Type",
             "name": "TiresService",
-            "moduleUrl": "asset:hierarchical_di/lib/car_services.dart",
+            "moduleUrl": "asset:hierarchical_di/lib/src/car_services.dart",
             "prefix": null,
             "isHost": false,
             "value": null,
