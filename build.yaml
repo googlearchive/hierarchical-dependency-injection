@@ -1,7 +1,0 @@
-targets:
-  hierarchical_di:
-    builders:
-      build_web_compilers|entrypoint:
-        options:
-          compiler: dart2js
-  
