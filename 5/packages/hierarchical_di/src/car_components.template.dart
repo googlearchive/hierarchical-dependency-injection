@@ -28,7 +28,7 @@ const List<dynamic> styles$CCarComponent = const [];
 
 class ViewCCarComponent0 extends AppView<import1.CCarComponent> {
   import2.DivElement _el_0;
-  import2.Text _text_1;
+  import2.Text _text_2;
   var _expr_0;
   static RenderComponentType _renderType;
   ViewCCarComponent0(AppView<dynamic> parentView, num parentIndex) : super(import4.ViewType.COMPONENT, {}, parentView, parentIndex, ChangeDetectionStrategy.CheckAlways) {
@@ -41,8 +41,10 @@ class ViewCCarComponent0 extends AppView<import1.CCarComponent> {
     final import2.HtmlElement parentRenderNode = initViewRoot(rootEl);
     var doc = import2.document;
     _el_0 = createDivAndAppend(doc, parentRenderNode);
-    _text_1 = new import2.Text('');
+    import2.Text _text_1 = new import2.Text('C: ');
     _el_0.append(_text_1);
+    _text_2 = new import2.Text('');
+    _el_0.append(_text_2);
     init(const [], null);
     return null;
   }
@@ -50,9 +52,9 @@ class ViewCCarComponent0 extends AppView<import1.CCarComponent> {
   @override
   void detectChangesInternal() {
     final import1.CCarComponent _ctx = ctx;
-    final currVal_0 = import6.interpolate1('C: ', _ctx.description, '');
+    final currVal_0 = (_ctx.description ?? '');
     if (!identical(_expr_0, currVal_0)) {
-      _text_1.text = currVal_0;
+      _text_2.text = currVal_0;
       _expr_0 = currVal_0;
     }
   }
@@ -111,11 +113,11 @@ const List<dynamic> styles$BCarComponent = const [];
 
 class ViewBCarComponent0 extends AppView<import1.BCarComponent> {
   import2.DivElement _el_0;
-  import2.Text _text_1;
-  import2.Element _el_2;
-  ViewCCarComponent0 _compView_2;
-  import8.CarService3 _CarService_2_4;
-  import1.CCarComponent _CCarComponent_2_5;
+  import2.Text _text_2;
+  import2.Element _el_3;
+  ViewCCarComponent0 _compView_3;
+  import8.CarService3 _CarService_3_4;
+  import1.CCarComponent _CCarComponent_3_5;
   var _expr_0;
   static RenderComponentType _renderType;
   ViewBCarComponent0(AppView<dynamic> parentView, num parentIndex) : super(import4.ViewType.COMPONENT, {}, parentView, parentIndex, ChangeDetectionStrategy.CheckAlways) {
@@ -128,25 +130,27 @@ class ViewBCarComponent0 extends AppView<import1.BCarComponent> {
     final import2.HtmlElement parentRenderNode = initViewRoot(rootEl);
     var doc = import2.document;
     _el_0 = createDivAndAppend(doc, parentRenderNode);
-    _text_1 = new import2.Text('');
+    import2.Text _text_1 = new import2.Text('B: ');
     _el_0.append(_text_1);
-    _compView_2 = new ViewCCarComponent0(this, 2);
-    _el_2 = _compView_2.rootEl;
-    parentRenderNode.append(_el_2);
-    _CarService_2_4 = new import8.CarService3(parentView.injectorGet(import8.EngineService, viewData.parentIndex), parentView.injectorGet(import8.TiresService, viewData.parentIndex));
-    _CCarComponent_2_5 = new import1.CCarComponent(_CarService_2_4);
-    _compView_2.create(_CCarComponent_2_5, []);
+    _text_2 = new import2.Text('');
+    _el_0.append(_text_2);
+    _compView_3 = new ViewCCarComponent0(this, 3);
+    _el_3 = _compView_3.rootEl;
+    parentRenderNode.append(_el_3);
+    _CarService_3_4 = new import8.CarService3(parentView.injectorGet(import8.EngineService, viewData.parentIndex), parentView.injectorGet(import8.TiresService, viewData.parentIndex));
+    _CCarComponent_3_5 = new import1.CCarComponent(_CarService_3_4);
+    _compView_3.create(_CCarComponent_3_5, []);
     init(const [], null);
     return null;
   }
 
   @override
   dynamic injectorGetInternal(dynamic token, int nodeIndex, dynamic notFoundResult) {
-    if ((identical(token, import8.CarService) && (2 == nodeIndex))) {
-      return _CarService_2_4;
+    if ((identical(token, import8.CarService) && (3 == nodeIndex))) {
+      return _CarService_3_4;
     }
-    if ((identical(token, import1.CCarComponent) && (2 == nodeIndex))) {
-      return _CCarComponent_2_5;
+    if ((identical(token, import1.CCarComponent) && (3 == nodeIndex))) {
+      return _CCarComponent_3_5;
     }
     return notFoundResult;
   }
@@ -154,17 +158,17 @@ class ViewBCarComponent0 extends AppView<import1.BCarComponent> {
   @override
   void detectChangesInternal() {
     final import1.BCarComponent _ctx = ctx;
-    final currVal_0 = import6.interpolate1('B: ', _ctx.description, '');
+    final currVal_0 = (_ctx.description ?? '');
     if (!identical(_expr_0, currVal_0)) {
-      _text_1.text = currVal_0;
+      _text_2.text = currVal_0;
       _expr_0 = currVal_0;
     }
-    _compView_2.detectChanges();
+    _compView_3.detectChanges();
   }
 
   @override
   void destroyInternal() {
-    _compView_2?.destroy();
+    _compView_3?.destroy();
   }
 }
 
@@ -226,12 +230,12 @@ const List<dynamic> styles$ACarComponent = const [];
 
 class ViewACarComponent0 extends AppView<import1.ACarComponent> {
   import2.DivElement _el_0;
-  import2.Text _text_1;
-  import2.Element _el_2;
-  ViewBCarComponent0 _compView_2;
-  import8.EngineService2 _EngineService_2_4;
-  import8.CarService2 _CarService_2_5;
-  import1.BCarComponent _BCarComponent_2_6;
+  import2.Text _text_2;
+  import2.Element _el_3;
+  ViewBCarComponent0 _compView_3;
+  import8.EngineService2 _EngineService_3_4;
+  import8.CarService2 _CarService_3_5;
+  import1.BCarComponent _BCarComponent_3_6;
   var _expr_0;
   static RenderComponentType _renderType;
   ViewACarComponent0(AppView<dynamic> parentView, num parentIndex) : super(import4.ViewType.COMPONENT, {}, parentView, parentIndex, ChangeDetectionStrategy.CheckAlways) {
@@ -244,29 +248,31 @@ class ViewACarComponent0 extends AppView<import1.ACarComponent> {
     final import2.HtmlElement parentRenderNode = initViewRoot(rootEl);
     var doc = import2.document;
     _el_0 = createDivAndAppend(doc, parentRenderNode);
-    _text_1 = new import2.Text('');
+    import2.Text _text_1 = new import2.Text('A: ');
     _el_0.append(_text_1);
-    _compView_2 = new ViewBCarComponent0(this, 2);
-    _el_2 = _compView_2.rootEl;
-    parentRenderNode.append(_el_2);
-    _EngineService_2_4 = new import8.EngineService2();
-    _CarService_2_5 = new import8.CarService2(_EngineService_2_4, parentView.injectorGet(import8.TiresService, viewData.parentIndex));
-    _BCarComponent_2_6 = new import1.BCarComponent(_CarService_2_5);
-    _compView_2.create(_BCarComponent_2_6, []);
+    _text_2 = new import2.Text('');
+    _el_0.append(_text_2);
+    _compView_3 = new ViewBCarComponent0(this, 3);
+    _el_3 = _compView_3.rootEl;
+    parentRenderNode.append(_el_3);
+    _EngineService_3_4 = new import8.EngineService2();
+    _CarService_3_5 = new import8.CarService2(_EngineService_3_4, parentView.injectorGet(import8.TiresService, viewData.parentIndex));
+    _BCarComponent_3_6 = new import1.BCarComponent(_CarService_3_5);
+    _compView_3.create(_BCarComponent_3_6, []);
     init(const [], null);
     return null;
   }
 
   @override
   dynamic injectorGetInternal(dynamic token, int nodeIndex, dynamic notFoundResult) {
-    if ((identical(token, import8.EngineService) && (2 == nodeIndex))) {
-      return _EngineService_2_4;
+    if ((identical(token, import8.EngineService) && (3 == nodeIndex))) {
+      return _EngineService_3_4;
     }
-    if ((identical(token, import8.CarService) && (2 == nodeIndex))) {
-      return _CarService_2_5;
+    if ((identical(token, import8.CarService) && (3 == nodeIndex))) {
+      return _CarService_3_5;
     }
-    if ((identical(token, import1.BCarComponent) && (2 == nodeIndex))) {
-      return _BCarComponent_2_6;
+    if ((identical(token, import1.BCarComponent) && (3 == nodeIndex))) {
+      return _BCarComponent_3_6;
     }
     return notFoundResult;
   }
@@ -274,17 +280,17 @@ class ViewACarComponent0 extends AppView<import1.ACarComponent> {
   @override
   void detectChangesInternal() {
     final import1.ACarComponent _ctx = ctx;
-    final currVal_0 = import6.interpolate1('A: ', _ctx.description, '');
+    final currVal_0 = (_ctx.description ?? '');
     if (!identical(_expr_0, currVal_0)) {
-      _text_1.text = currVal_0;
+      _text_2.text = currVal_0;
       _expr_0 = currVal_0;
     }
-    _compView_2.detectChanges();
+    _compView_3.detectChanges();
   }
 
   @override
   void destroyInternal() {
-    _compView_2?.destroy();
+    _compView_3?.destroy();
   }
 }
 

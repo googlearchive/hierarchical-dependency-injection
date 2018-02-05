@@ -47,21 +47,21 @@ class ViewHeroTaxReturnComponent0 extends AppView<import2.HeroTaxReturnComponent
   import3.Element _el_4;
   import3.Text _text_5;
   import3.Element _el_6;
-  import3.Text _text_7;
-  import3.Element _el_8;
+  import3.Text _text_8;
   import3.Element _el_9;
-  import3.InputElement _el_11;
-  import4.DefaultValueAccessor _DefaultValueAccessor_11_4;
-  import5.NumberValueAccessor _NumberValueAccessor_11_5;
-  List<dynamic> _NgValueAccessor_11_6;
-  import6.NgModel _NgModel_11_7;
-  import3.Element _el_12;
+  import3.Element _el_10;
+  import3.InputElement _el_12;
+  import4.DefaultValueAccessor _DefaultValueAccessor_12_4;
+  import5.NumberValueAccessor _NumberValueAccessor_12_5;
+  List<dynamic> _NgValueAccessor_12_6;
+  import6.NgModel _NgModel_12_7;
   import3.Element _el_13;
-  import3.Text _text_14;
-  import3.Element _el_15;
-  import3.ButtonElement _el_16;
+  import3.Element _el_14;
+  import3.Text _text_16;
+  import3.Element _el_17;
   import3.ButtonElement _el_18;
   import3.ButtonElement _el_20;
+  import3.ButtonElement _el_22;
   bool _expr_0;
   var _expr_1;
   var _expr_2;
@@ -95,66 +95,70 @@ class ViewHeroTaxReturnComponent0 extends AppView<import2.HeroTaxReturnComponent
     _el_6 = createAndAppend(doc, 'label', _el_3);
     createAttr(_el_6, 'id', 'tid');
     addShimE(_el_6);
-    _text_7 = new import3.Text('');
+    import3.Text _text_7 = new import3.Text('TID: ');
     _el_6.append(_text_7);
-    _el_8 = createAndAppend(doc, 'fieldset', _el_0);
-    addShimE(_el_8);
-    _el_9 = createAndAppend(doc, 'label', _el_8);
+    _text_8 = new import3.Text('');
+    _el_6.append(_text_8);
+    _el_9 = createAndAppend(doc, 'fieldset', _el_0);
     addShimE(_el_9);
-    import3.Text _text_10 = new import3.Text('Income:');
-    _el_9.append(_text_10);
-    _el_11 = createAndAppend(doc, 'input', _el_9);
-    _el_11.className = 'num';
-    createAttr(_el_11, 'type', 'number');
-    addShimC(_el_11);
-    _DefaultValueAccessor_11_4 = new import4.DefaultValueAccessor(_el_11);
-    _NumberValueAccessor_11_5 = new import5.NumberValueAccessor(_el_11);
-    _NgValueAccessor_11_6 = [_DefaultValueAccessor_11_4, _NumberValueAccessor_11_5];
-    _NgModel_11_7 = new import6.NgModel(null, _NgValueAccessor_11_6);
-    _el_12 = createAndAppend(doc, 'fieldset', _el_0);
-    addShimE(_el_12);
-    _el_13 = createAndAppend(doc, 'label', _el_12);
+    _el_10 = createAndAppend(doc, 'label', _el_9);
+    addShimE(_el_10);
+    import3.Text _text_11 = new import3.Text('Income:');
+    _el_10.append(_text_11);
+    _el_12 = createAndAppend(doc, 'input', _el_10);
+    _el_12.className = 'num';
+    createAttr(_el_12, 'type', 'number');
+    addShimC(_el_12);
+    _DefaultValueAccessor_12_4 = new import4.DefaultValueAccessor(_el_12);
+    _NumberValueAccessor_12_5 = new import5.NumberValueAccessor(_el_12);
+    _NgValueAccessor_12_6 = [_DefaultValueAccessor_12_4, _NumberValueAccessor_12_5];
+    _NgModel_12_7 = new import6.NgModel(null, _NgValueAccessor_12_6);
+    _el_13 = createAndAppend(doc, 'fieldset', _el_0);
     addShimE(_el_13);
-    _text_14 = new import3.Text('');
-    _el_13.append(_text_14);
-    _el_15 = createAndAppend(doc, 'fieldset', _el_0);
-    addShimE(_el_15);
-    _el_16 = createAndAppend(doc, 'button', _el_15);
-    addShimC(_el_16);
-    import3.Text _text_17 = new import3.Text('Save');
-    _el_16.append(_text_17);
-    _el_18 = createAndAppend(doc, 'button', _el_15);
+    _el_14 = createAndAppend(doc, 'label', _el_13);
+    addShimE(_el_14);
+    import3.Text _text_15 = new import3.Text('Tax: ');
+    _el_14.append(_text_15);
+    _text_16 = new import3.Text('');
+    _el_14.append(_text_16);
+    _el_17 = createAndAppend(doc, 'fieldset', _el_0);
+    addShimE(_el_17);
+    _el_18 = createAndAppend(doc, 'button', _el_17);
     addShimC(_el_18);
-    import3.Text _text_19 = new import3.Text('Cancel');
+    import3.Text _text_19 = new import3.Text('Save');
     _el_18.append(_text_19);
-    _el_20 = createAndAppend(doc, 'button', _el_15);
+    _el_20 = createAndAppend(doc, 'button', _el_17);
     addShimC(_el_20);
-    import3.Text _text_21 = new import3.Text('Close');
+    import3.Text _text_21 = new import3.Text('Cancel');
     _el_20.append(_text_21);
-    _el_11.addEventListener('input', eventHandler1(_handle_input_11_1));
-    _el_11.addEventListener('blur', eventHandler1(_handle_blur_11_2));
-    _el_11.addEventListener('change', eventHandler1(_handle_change_11_3));
-    final subscription_0 = _NgModel_11_7.update.listen(eventHandler1(_handle_ngModelChange_11_0));
-    _el_16.addEventListener('click', eventHandler0(ctx.onSaved));
-    _el_18.addEventListener('click', eventHandler0(ctx.onCanceled));
-    _el_20.addEventListener('click', eventHandler0(ctx.onClose));
+    _el_22 = createAndAppend(doc, 'button', _el_17);
+    addShimC(_el_22);
+    import3.Text _text_23 = new import3.Text('Close');
+    _el_22.append(_text_23);
+    _el_12.addEventListener('input', eventHandler1(_handle_input_12_1));
+    _el_12.addEventListener('blur', eventHandler1(_handle_blur_12_2));
+    _el_12.addEventListener('change', eventHandler1(_handle_change_12_3));
+    final subscription_0 = _NgModel_12_7.update.listen(eventHandler1(_handle_ngModelChange_12_0));
+    _el_18.addEventListener('click', eventHandler0(ctx.onSaved));
+    _el_20.addEventListener('click', eventHandler0(ctx.onCanceled));
+    _el_22.addEventListener('click', eventHandler0(ctx.onClose));
     init(const [], [subscription_0]);
     return null;
   }
 
   @override
   dynamic injectorGetInternal(dynamic token, int nodeIndex, dynamic notFoundResult) {
-    if ((identical(token, import4.DefaultValueAccessor) && (11 == nodeIndex))) {
-      return _DefaultValueAccessor_11_4;
+    if ((identical(token, import4.DefaultValueAccessor) && (12 == nodeIndex))) {
+      return _DefaultValueAccessor_12_4;
     }
-    if ((identical(token, import5.NumberValueAccessor) && (11 == nodeIndex))) {
-      return _NumberValueAccessor_11_5;
+    if ((identical(token, import5.NumberValueAccessor) && (12 == nodeIndex))) {
+      return _NumberValueAccessor_12_5;
     }
-    if ((identical(token, const import12.OpaqueToken<import13.ControlValueAccessor<dynamic>>('NgValueAccessor')) && (11 == nodeIndex))) {
-      return _NgValueAccessor_11_6;
+    if ((identical(token, const import12.OpaqueToken<import13.ControlValueAccessor<dynamic>>('NgValueAccessor')) && (12 == nodeIndex))) {
+      return _NgValueAccessor_12_6;
     }
-    if (((identical(token, import6.NgModel) || identical(token, import14.NgControl)) && (11 == nodeIndex))) {
-      return _NgModel_11_7;
+    if (((identical(token, import6.NgModel) || identical(token, import14.NgControl)) && (12 == nodeIndex))) {
+      return _NgModel_12_7;
     }
     return notFoundResult;
   }
@@ -165,10 +169,10 @@ class ViewHeroTaxReturnComponent0 extends AppView<import2.HeroTaxReturnComponent
     bool changed = false;
     bool firstCheck = (this.cdState == 0);
     changed = false;
-    _NgModel_11_7.model = _ctx.taxReturn.income;
-    _NgModel_11_7.ngAfterChanges();
+    _NgModel_12_7.model = _ctx.taxReturn.income;
+    _NgModel_12_7.ngAfterChanges();
     if (firstCheck) {
-      _NgModel_11_7.ngOnInit();
+      _NgModel_12_7.ngOnInit();
     }
     final currVal_0 = identical(_ctx.message, 'Canceled');
     if (!identical(_expr_0, currVal_0)) {
@@ -185,34 +189,34 @@ class ViewHeroTaxReturnComponent0 extends AppView<import2.HeroTaxReturnComponent
       _text_5.text = currVal_2;
       _expr_2 = currVal_2;
     }
-    final currVal_3 = import10.interpolate1('TID: ', _ctx.taxReturn.taxId, '');
+    final currVal_3 = import10.interpolate0(_ctx.taxReturn.taxId);
     if (!identical(_expr_3, currVal_3)) {
-      _text_7.text = currVal_3;
+      _text_8.text = currVal_3;
       _expr_3 = currVal_3;
     }
-    final currVal_5 = import10.interpolate1('Tax: ', _ctx.taxReturn.tax, '');
+    final currVal_5 = import10.interpolate0(_ctx.taxReturn.tax);
     if (!identical(_expr_5, currVal_5)) {
-      _text_14.text = currVal_5;
+      _text_16.text = currVal_5;
       _expr_5 = currVal_5;
     }
   }
 
-  void _handle_ngModelChange_11_0($event) {
+  void _handle_ngModelChange_12_0($event) {
     ctx.taxReturn.income = $event;
   }
 
-  void _handle_input_11_1($event) {
-    _DefaultValueAccessor_11_4.onChange($event.target.value);
-    _NumberValueAccessor_11_5.onChange($event.target.value);
+  void _handle_input_12_1($event) {
+    _DefaultValueAccessor_12_4.onChange($event.target.value);
+    _NumberValueAccessor_12_5.onChange($event.target.value);
   }
 
-  void _handle_blur_11_2($event) {
-    _DefaultValueAccessor_11_4.touchHandler();
-    _NumberValueAccessor_11_5.touchHandler();
+  void _handle_blur_12_2($event) {
+    _DefaultValueAccessor_12_4.touchHandler();
+    _NumberValueAccessor_12_5.touchHandler();
   }
 
-  void _handle_change_11_3($event) {
-    _NumberValueAccessor_11_5.onChange($event.target.value);
+  void _handle_change_12_3($event) {
+    _NumberValueAccessor_12_5.onChange($event.target.value);
   }
 }
 
