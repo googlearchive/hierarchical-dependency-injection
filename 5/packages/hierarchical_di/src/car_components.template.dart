@@ -9,11 +9,9 @@ import 'car_components.dart';
 export 'car_components.dart';
 import 'package:angular/angular.dart';
 import 'car_services.dart';
-// Required for initReflector().
 import 'package:angular/src/di/reflector.dart' as _ngRef;
 import 'car_services.template.dart' as _ref0;
 import 'package:angular/angular.template.dart' as _ref1;
-
 import 'package:angular/src/core/linker/app_view.dart';
 import 'car_components.dart' as import1;
 import 'dart:html' as import2;
@@ -440,22 +438,11 @@ void initReflector() {
     return;
   }
   _visited = true;
+
+  _ngRef.registerComponent(CCarComponent, CCarComponentNgFactory);
+  _ngRef.registerComponent(BCarComponent, BCarComponentNgFactory);
+  _ngRef.registerComponent(ACarComponent, ACarComponentNgFactory);
+  _ngRef.registerComponent(CarsComponent, CarsComponentNgFactory);
   _ref0.initReflector();
   _ref1.initReflector();
-  _ngRef.registerComponent(
-    CCarComponent,
-    CCarComponentNgFactory,
-  );
-  _ngRef.registerComponent(
-    BCarComponent,
-    BCarComponentNgFactory,
-  );
-  _ngRef.registerComponent(
-    ACarComponent,
-    ACarComponentNgFactory,
-  );
-  _ngRef.registerComponent(
-    CarsComponent,
-    CarsComponentNgFactory,
-  );
 }

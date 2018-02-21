@@ -12,14 +12,12 @@ import 'src/car_components.dart';
 import 'src/heroes_list_component.dart';
 import 'src/heroes_service.dart';
 import 'src/villains_list_component.dart';
-// Required for initReflector().
 import 'package:angular/src/di/reflector.dart' as _ngRef;
 import 'package:angular/angular.template.dart' as _ref0;
 import 'src/car_components.template.dart' as _ref1;
 import 'src/heroes_list_component.template.dart' as _ref2;
 import 'src/heroes_service.template.dart' as _ref3;
 import 'src/villains_list_component.template.dart' as _ref4;
-
 import 'package:angular/src/core/linker/app_view.dart';
 import 'app_component.dart' as import1;
 import 'dart:html' as import2;
@@ -376,13 +374,11 @@ void initReflector() {
     return;
   }
   _visited = true;
+
+  _ngRef.registerComponent(AppComponent, AppComponentNgFactory);
   _ref0.initReflector();
   _ref1.initReflector();
   _ref2.initReflector();
   _ref3.initReflector();
   _ref4.initReflector();
-  _ngRef.registerComponent(
-    AppComponent,
-    AppComponentNgFactory,
-  );
 }

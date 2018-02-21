@@ -11,11 +11,11 @@ import 'dart:async';
 import 'package:angular/angular.dart';
 import 'hero.dart';
 import 'heroes_service.dart';
-// Required for initReflector().
 import 'package:angular/src/di/reflector.dart' as _ngRef;
 import 'hero.template.dart' as _ref0;
 import 'heroes_service.template.dart' as _ref1;
 import 'package:angular/angular.template.dart' as _ref2;
+import 'package:hierarchical_di/src/heroes_service.dart' as _i1;
 
 var _visited = false;
 void initReflector() {
@@ -23,19 +23,12 @@ void initReflector() {
     return;
   }
   _visited = true;
+
+  _ngRef.registerFactory(HeroTaxReturnService, (_i1.HeroesService p0) => new HeroTaxReturnService(p0));
+  _ngRef.registerDependencies(HeroTaxReturnService, const [
+    const [_i1.HeroesService]
+  ]);
   _ref0.initReflector();
   _ref1.initReflector();
   _ref2.initReflector();
-  _ngRef.registerFactory(
-    HeroTaxReturnService,
-    (HeroesService p0) => new HeroTaxReturnService(p0),
-  );
-  _ngRef.registerDependencies(
-    HeroTaxReturnService,
-    const [
-      const [
-        HeroesService,
-      ],
-    ],
-  );
 }

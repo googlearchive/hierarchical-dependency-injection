@@ -10,7 +10,6 @@ export 'heroes_service.dart';
 import 'dart:async';
 import 'package:angular/angular.dart';
 import 'hero.dart';
-// Required for initReflector().
 import 'package:angular/src/di/reflector.dart' as _ngRef;
 import 'hero.template.dart' as _ref0;
 import 'package:angular/angular.template.dart' as _ref1;
@@ -21,10 +20,8 @@ void initReflector() {
     return;
   }
   _visited = true;
+
+  _ngRef.registerFactory(HeroesService, () => new HeroesService());
   _ref0.initReflector();
   _ref1.initReflector();
-  _ngRef.registerFactory(
-    HeroesService,
-    () => new HeroesService(),
-  );
 }
