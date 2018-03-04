@@ -1,7 +1,5 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
-
 // **************************************************************************
-// Generator: TemplateGenerator
+// Generator: Instance of 'Compiler'
 // **************************************************************************
 
 // ignore_for_file: cancel_subscriptions,constant_identifier_names,duplicate_import,non_constant_identifier_names,library_prefixes,UNUSED_IMPORT,UNUSED_SHOWN_NAME
@@ -66,27 +64,24 @@ const List<dynamic> styles$CCarComponentHost = const [];
 
 class _ViewCCarComponentHost0 extends AppView<dynamic> {
   ViewCCarComponent0 _compView_0;
-  import8.CarService3 _CarService_0_4;
-  import1.CCarComponent _CCarComponent_0_5;
+  import8.CarService3 _CarService_0_5;
+  import1.CCarComponent _CCarComponent_0_6;
   _ViewCCarComponentHost0(AppView<dynamic> parentView, num parentIndex) : super(import4.ViewType.HOST, {}, parentView, parentIndex, ChangeDetectionStrategy.CheckAlways);
   @override
   ComponentRef build() {
     _compView_0 = new ViewCCarComponent0(this, 0);
     rootEl = _compView_0.rootEl;
-    _CarService_0_4 = new import8.CarService3(this.injectorGet(import8.EngineService, viewData.parentIndex), this.injectorGet(import8.TiresService, viewData.parentIndex));
-    _CCarComponent_0_5 = new import1.CCarComponent(_CarService_0_4);
-    _compView_0.create(_CCarComponent_0_5, projectableNodes);
+    _CarService_0_5 = new import8.CarService3(this.injectorGet(import8.EngineService, viewData.parentIndex), this.injectorGet(import8.TiresService, viewData.parentIndex));
+    _CCarComponent_0_6 = new import1.CCarComponent(_CarService_0_5);
+    _compView_0.create(_CCarComponent_0_6, projectableNodes);
     init0(rootEl);
-    return new ComponentRef<import1.CCarComponent>(0, this, rootEl, _CCarComponent_0_5);
+    return new ComponentRef<import1.CCarComponent>(0, this, rootEl, _CCarComponent_0_6);
   }
 
   @override
   dynamic injectorGetInternal(dynamic token, int nodeIndex, dynamic notFoundResult) {
     if ((identical(token, import8.CarService) && (0 == nodeIndex))) {
-      return _CarService_0_4;
-    }
-    if ((identical(token, import1.CCarComponent) && (0 == nodeIndex))) {
-      return _CCarComponent_0_5;
+      return _CarService_0_5;
     }
     return notFoundResult;
   }
@@ -114,8 +109,8 @@ class ViewBCarComponent0 extends AppView<import1.BCarComponent> {
   import2.Text _text_2;
   import2.Element _el_3;
   ViewCCarComponent0 _compView_3;
-  import8.CarService3 _CarService_3_4;
-  import1.CCarComponent _CCarComponent_3_5;
+  import8.CarService3 _CarService_3_5;
+  import1.CCarComponent _CCarComponent_3_6;
   var _expr_0;
   static RenderComponentType _renderType;
   ViewBCarComponent0(AppView<dynamic> parentView, num parentIndex) : super(import4.ViewType.COMPONENT, {}, parentView, parentIndex, ChangeDetectionStrategy.CheckAlways) {
@@ -135,9 +130,9 @@ class ViewBCarComponent0 extends AppView<import1.BCarComponent> {
     _compView_3 = new ViewCCarComponent0(this, 3);
     _el_3 = _compView_3.rootEl;
     parentRenderNode.append(_el_3);
-    _CarService_3_4 = new import8.CarService3(parentView.injectorGet(import8.EngineService, viewData.parentIndex), parentView.injectorGet(import8.TiresService, viewData.parentIndex));
-    _CCarComponent_3_5 = new import1.CCarComponent(_CarService_3_4);
-    _compView_3.create(_CCarComponent_3_5, []);
+    _CarService_3_5 = new import8.CarService3(parentView.injectorGet(import8.EngineService, viewData.parentIndex), parentView.injectorGet(import8.TiresService, viewData.parentIndex));
+    _CCarComponent_3_6 = new import1.CCarComponent(_CarService_3_5);
+    _compView_3.create(_CCarComponent_3_6, []);
     init(const [], null);
     return null;
   }
@@ -145,10 +140,7 @@ class ViewBCarComponent0 extends AppView<import1.BCarComponent> {
   @override
   dynamic injectorGetInternal(dynamic token, int nodeIndex, dynamic notFoundResult) {
     if ((identical(token, import8.CarService) && (3 == nodeIndex))) {
-      return _CarService_3_4;
-    }
-    if ((identical(token, import1.CCarComponent) && (3 == nodeIndex))) {
-      return _CCarComponent_3_5;
+      return _CarService_3_5;
     }
     return notFoundResult;
   }
@@ -178,32 +170,29 @@ const List<dynamic> styles$BCarComponentHost = const [];
 
 class _ViewBCarComponentHost0 extends AppView<dynamic> {
   ViewBCarComponent0 _compView_0;
-  import8.EngineService2 _EngineService_0_4;
-  import8.CarService2 _CarService_0_5;
-  import1.BCarComponent _BCarComponent_0_6;
+  import8.EngineService2 _EngineService_0_5;
+  import8.CarService2 _CarService_0_6;
+  import1.BCarComponent _BCarComponent_0_7;
   _ViewBCarComponentHost0(AppView<dynamic> parentView, num parentIndex) : super(import4.ViewType.HOST, {}, parentView, parentIndex, ChangeDetectionStrategy.CheckAlways);
   @override
   ComponentRef build() {
     _compView_0 = new ViewBCarComponent0(this, 0);
     rootEl = _compView_0.rootEl;
-    _EngineService_0_4 = new import8.EngineService2();
-    _CarService_0_5 = new import8.CarService2(_EngineService_0_4, this.injectorGet(import8.TiresService, viewData.parentIndex));
-    _BCarComponent_0_6 = new import1.BCarComponent(_CarService_0_5);
-    _compView_0.create(_BCarComponent_0_6, projectableNodes);
+    _EngineService_0_5 = new import8.EngineService2();
+    _CarService_0_6 = new import8.CarService2(_EngineService_0_5, this.injectorGet(import8.TiresService, viewData.parentIndex));
+    _BCarComponent_0_7 = new import1.BCarComponent(_CarService_0_6);
+    _compView_0.create(_BCarComponent_0_7, projectableNodes);
     init0(rootEl);
-    return new ComponentRef<import1.BCarComponent>(0, this, rootEl, _BCarComponent_0_6);
+    return new ComponentRef<import1.BCarComponent>(0, this, rootEl, _BCarComponent_0_7);
   }
 
   @override
   dynamic injectorGetInternal(dynamic token, int nodeIndex, dynamic notFoundResult) {
     if ((identical(token, import8.EngineService) && (0 == nodeIndex))) {
-      return _EngineService_0_4;
+      return _EngineService_0_5;
     }
     if ((identical(token, import8.CarService) && (0 == nodeIndex))) {
-      return _CarService_0_5;
-    }
-    if ((identical(token, import1.BCarComponent) && (0 == nodeIndex))) {
-      return _BCarComponent_0_6;
+      return _CarService_0_6;
     }
     return notFoundResult;
   }
@@ -231,9 +220,9 @@ class ViewACarComponent0 extends AppView<import1.ACarComponent> {
   import2.Text _text_2;
   import2.Element _el_3;
   ViewBCarComponent0 _compView_3;
-  import8.EngineService2 _EngineService_3_4;
-  import8.CarService2 _CarService_3_5;
-  import1.BCarComponent _BCarComponent_3_6;
+  import8.EngineService2 _EngineService_3_5;
+  import8.CarService2 _CarService_3_6;
+  import1.BCarComponent _BCarComponent_3_7;
   var _expr_0;
   static RenderComponentType _renderType;
   ViewACarComponent0(AppView<dynamic> parentView, num parentIndex) : super(import4.ViewType.COMPONENT, {}, parentView, parentIndex, ChangeDetectionStrategy.CheckAlways) {
@@ -253,10 +242,10 @@ class ViewACarComponent0 extends AppView<import1.ACarComponent> {
     _compView_3 = new ViewBCarComponent0(this, 3);
     _el_3 = _compView_3.rootEl;
     parentRenderNode.append(_el_3);
-    _EngineService_3_4 = new import8.EngineService2();
-    _CarService_3_5 = new import8.CarService2(_EngineService_3_4, parentView.injectorGet(import8.TiresService, viewData.parentIndex));
-    _BCarComponent_3_6 = new import1.BCarComponent(_CarService_3_5);
-    _compView_3.create(_BCarComponent_3_6, []);
+    _EngineService_3_5 = new import8.EngineService2();
+    _CarService_3_6 = new import8.CarService2(_EngineService_3_5, parentView.injectorGet(import8.TiresService, viewData.parentIndex));
+    _BCarComponent_3_7 = new import1.BCarComponent(_CarService_3_6);
+    _compView_3.create(_BCarComponent_3_7, []);
     init(const [], null);
     return null;
   }
@@ -264,13 +253,10 @@ class ViewACarComponent0 extends AppView<import1.ACarComponent> {
   @override
   dynamic injectorGetInternal(dynamic token, int nodeIndex, dynamic notFoundResult) {
     if ((identical(token, import8.EngineService) && (3 == nodeIndex))) {
-      return _EngineService_3_4;
+      return _EngineService_3_5;
     }
     if ((identical(token, import8.CarService) && (3 == nodeIndex))) {
-      return _CarService_3_5;
-    }
-    if ((identical(token, import1.BCarComponent) && (3 == nodeIndex))) {
-      return _BCarComponent_3_6;
+      return _CarService_3_6;
     }
     return notFoundResult;
   }
@@ -300,24 +286,16 @@ const List<dynamic> styles$ACarComponentHost = const [];
 
 class _ViewACarComponentHost0 extends AppView<dynamic> {
   ViewACarComponent0 _compView_0;
-  import1.ACarComponent _ACarComponent_0_4;
+  import1.ACarComponent _ACarComponent_0_5;
   _ViewACarComponentHost0(AppView<dynamic> parentView, num parentIndex) : super(import4.ViewType.HOST, {}, parentView, parentIndex, ChangeDetectionStrategy.CheckAlways);
   @override
   ComponentRef build() {
     _compView_0 = new ViewACarComponent0(this, 0);
     rootEl = _compView_0.rootEl;
-    _ACarComponent_0_4 = new import1.ACarComponent(this.injectorGet(import8.CarService, viewData.parentIndex));
-    _compView_0.create(_ACarComponent_0_4, projectableNodes);
+    _ACarComponent_0_5 = new import1.ACarComponent(this.injectorGet(import8.CarService, viewData.parentIndex));
+    _compView_0.create(_ACarComponent_0_5, projectableNodes);
     init0(rootEl);
-    return new ComponentRef<import1.ACarComponent>(0, this, rootEl, _ACarComponent_0_4);
-  }
-
-  @override
-  dynamic injectorGetInternal(dynamic token, int nodeIndex, dynamic notFoundResult) {
-    if ((identical(token, import1.ACarComponent) && (0 == nodeIndex))) {
-      return _ACarComponent_0_4;
-    }
-    return notFoundResult;
+    return new ComponentRef<import1.ACarComponent>(0, this, rootEl, _ACarComponent_0_5);
   }
 
   @override
@@ -342,7 +320,7 @@ class ViewCarsComponent0 extends AppView<import1.CarsComponent> {
   import2.Element _el_0;
   import2.Element _el_2;
   ViewACarComponent0 _compView_2;
-  import1.ACarComponent _ACarComponent_2_4;
+  import1.ACarComponent _ACarComponent_2_5;
   static RenderComponentType _renderType;
   ViewCarsComponent0(AppView<dynamic> parentView, num parentIndex) : super(import4.ViewType.COMPONENT, {}, parentView, parentIndex, ChangeDetectionStrategy.CheckAlways) {
     rootEl = import2.document.createElement('my-cars');
@@ -359,18 +337,10 @@ class ViewCarsComponent0 extends AppView<import1.CarsComponent> {
     _compView_2 = new ViewACarComponent0(this, 2);
     _el_2 = _compView_2.rootEl;
     parentRenderNode.append(_el_2);
-    _ACarComponent_2_4 = new import1.ACarComponent(parentView.injectorGet(import8.CarService, viewData.parentIndex));
-    _compView_2.create(_ACarComponent_2_4, []);
+    _ACarComponent_2_5 = new import1.ACarComponent(parentView.injectorGet(import8.CarService, viewData.parentIndex));
+    _compView_2.create(_ACarComponent_2_5, []);
     init(const [], null);
     return null;
-  }
-
-  @override
-  dynamic injectorGetInternal(dynamic token, int nodeIndex, dynamic notFoundResult) {
-    if ((identical(token, import1.ACarComponent) && (2 == nodeIndex))) {
-      return _ACarComponent_2_4;
-    }
-    return notFoundResult;
   }
 
   @override
@@ -392,24 +362,16 @@ const List<dynamic> styles$CarsComponentHost = const [];
 
 class _ViewCarsComponentHost0 extends AppView<dynamic> {
   ViewCarsComponent0 _compView_0;
-  import1.CarsComponent _CarsComponent_0_4;
+  import1.CarsComponent _CarsComponent_0_5;
   _ViewCarsComponentHost0(AppView<dynamic> parentView, num parentIndex) : super(import4.ViewType.HOST, {}, parentView, parentIndex, ChangeDetectionStrategy.CheckAlways);
   @override
   ComponentRef build() {
     _compView_0 = new ViewCarsComponent0(this, 0);
     rootEl = _compView_0.rootEl;
-    _CarsComponent_0_4 = new import1.CarsComponent();
-    _compView_0.create(_CarsComponent_0_4, projectableNodes);
+    _CarsComponent_0_5 = new import1.CarsComponent();
+    _compView_0.create(_CarsComponent_0_5, projectableNodes);
     init0(rootEl);
-    return new ComponentRef<import1.CarsComponent>(0, this, rootEl, _CarsComponent_0_4);
-  }
-
-  @override
-  dynamic injectorGetInternal(dynamic token, int nodeIndex, dynamic notFoundResult) {
-    if ((identical(token, import1.CarsComponent) && (0 == nodeIndex))) {
-      return _CarsComponent_0_4;
-    }
-    return notFoundResult;
+    return new ComponentRef<import1.CarsComponent>(0, this, rootEl, _CarsComponent_0_5);
   }
 
   @override

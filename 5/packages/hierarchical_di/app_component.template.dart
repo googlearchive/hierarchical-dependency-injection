@@ -1,7 +1,5 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
-
 // **************************************************************************
-// Generator: TemplateGenerator
+// Generator: Instance of 'Compiler'
 // **************************************************************************
 
 // ignore_for_file: cancel_subscriptions,constant_identifier_names,duplicate_import,non_constant_identifier_names,library_prefixes,UNUSED_IMPORT,UNUSED_SHOWN_NAME
@@ -50,11 +48,11 @@ class ViewAppComponent0 extends AppView<import1.AppComponent> {
   import2.InputElement _el_7;
   import2.Element _el_9;
   ViewContainer _appEl_11;
-  NgIf _NgIf_11_7;
+  NgIf _NgIf_11_9;
   ViewContainer _appEl_12;
-  NgIf _NgIf_12_7;
+  NgIf _NgIf_12_9;
   ViewContainer _appEl_13;
-  NgIf _NgIf_13_7;
+  NgIf _NgIf_13_9;
   var _expr_0;
   var _expr_1;
   var _expr_2;
@@ -89,18 +87,18 @@ class ViewAppComponent0 extends AppView<import1.AppComponent> {
     var _anchor_11 = ngAnchor.clone(false);
     parentRenderNode.append(_anchor_11);
     _appEl_11 = new ViewContainer(11, null, this, _anchor_11);
-    TemplateRef _TemplateRef_11_6 = new TemplateRef(_appEl_11, viewFactory_AppComponent1);
-    _NgIf_11_7 = new NgIf(_appEl_11, _TemplateRef_11_6);
+    TemplateRef _TemplateRef_11_8 = new TemplateRef(_appEl_11, viewFactory_AppComponent1);
+    _NgIf_11_9 = new NgIf(_appEl_11, _TemplateRef_11_8);
     var _anchor_12 = ngAnchor.clone(false);
     parentRenderNode.append(_anchor_12);
     _appEl_12 = new ViewContainer(12, null, this, _anchor_12);
-    TemplateRef _TemplateRef_12_6 = new TemplateRef(_appEl_12, viewFactory_AppComponent2);
-    _NgIf_12_7 = new NgIf(_appEl_12, _TemplateRef_12_6);
+    TemplateRef _TemplateRef_12_8 = new TemplateRef(_appEl_12, viewFactory_AppComponent2);
+    _NgIf_12_9 = new NgIf(_appEl_12, _TemplateRef_12_8);
     var _anchor_13 = ngAnchor.clone(false);
     parentRenderNode.append(_anchor_13);
     _appEl_13 = new ViewContainer(13, null, this, _anchor_13);
-    TemplateRef _TemplateRef_13_6 = new TemplateRef(_appEl_13, viewFactory_AppComponent3);
-    _NgIf_13_7 = new NgIf(_appEl_13, _TemplateRef_13_6);
+    TemplateRef _TemplateRef_13_8 = new TemplateRef(_appEl_13, viewFactory_AppComponent3);
+    _NgIf_13_9 = new NgIf(_appEl_13, _TemplateRef_13_8);
     _el_1.addEventListener('change', eventHandler1(_handle_change_1_0));
     _el_4.addEventListener('change', eventHandler1(_handle_change_4_0));
     _el_7.addEventListener('change', eventHandler1(_handle_change_7_0));
@@ -111,9 +109,9 @@ class ViewAppComponent0 extends AppView<import1.AppComponent> {
   @override
   void detectChangesInternal() {
     final import1.AppComponent _ctx = ctx;
-    _NgIf_11_7.ngIf = _ctx.showHeroes;
-    _NgIf_12_7.ngIf = _ctx.showVillains;
-    _NgIf_13_7.ngIf = _ctx.showCars;
+    _NgIf_11_9.ngIf = _ctx.showHeroes;
+    _NgIf_12_9.ngIf = _ctx.showVillains;
+    _NgIf_13_9.ngIf = _ctx.showCars;
     _appEl_11.detectChangesInNestedViews();
     _appEl_12.detectChangesInNestedViews();
     _appEl_13.detectChangesInNestedViews();
@@ -161,7 +159,7 @@ AppView<import1.AppComponent> viewFactory_AppComponent0(AppView<dynamic> parentV
 class _ViewAppComponent1 extends AppView<import1.AppComponent> {
   import2.Element _el_0;
   import11.ViewHeroesListComponent0 _compView_0;
-  import12.HeroesListComponent _HeroesListComponent_0_4;
+  import12.HeroesListComponent _HeroesListComponent_0_5;
   _ViewAppComponent1(AppView<dynamic> parentView, num parentIndex) : super(import6.ViewType.EMBEDDED, {}, parentView, parentIndex, ChangeDetectionStrategy.CheckAlways) {
     componentType = ViewAppComponent0._renderType;
   }
@@ -169,18 +167,10 @@ class _ViewAppComponent1 extends AppView<import1.AppComponent> {
   ComponentRef<import1.AppComponent> build() {
     _compView_0 = new import11.ViewHeroesListComponent0(this, 0);
     _el_0 = _compView_0.rootEl;
-    _HeroesListComponent_0_4 = new import12.HeroesListComponent(parentView.injectorGet(import13.HeroesService, viewData.parentIndex));
-    _compView_0.create(_HeroesListComponent_0_4, []);
+    _HeroesListComponent_0_5 = new import12.HeroesListComponent(parentView.injectorGet(import13.HeroesService, viewData.parentIndex));
+    _compView_0.create(_HeroesListComponent_0_5, []);
     init0(_el_0);
     return null;
-  }
-
-  @override
-  dynamic injectorGetInternal(dynamic token, int nodeIndex, dynamic notFoundResult) {
-    if ((identical(token, import12.HeroesListComponent) && (0 == nodeIndex))) {
-      return _HeroesListComponent_0_4;
-    }
-    return notFoundResult;
   }
 
   @override
@@ -201,8 +191,8 @@ AppView<import1.AppComponent> viewFactory_AppComponent1(AppView<dynamic> parentV
 class _ViewAppComponent2 extends AppView<import1.AppComponent> {
   import2.Element _el_0;
   import14.ViewVillainsListComponent0 _compView_0;
-  import15.VillainsService _VillainsService_0_4;
-  import16.VillainsListComponent _VillainsListComponent_0_5;
+  import15.VillainsService _VillainsService_0_5;
+  import16.VillainsListComponent _VillainsListComponent_0_6;
   _ViewAppComponent2(AppView<dynamic> parentView, num parentIndex) : super(import6.ViewType.EMBEDDED, {}, parentView, parentIndex, ChangeDetectionStrategy.CheckAlways) {
     componentType = ViewAppComponent0._renderType;
   }
@@ -210,9 +200,9 @@ class _ViewAppComponent2 extends AppView<import1.AppComponent> {
   ComponentRef<import1.AppComponent> build() {
     _compView_0 = new import14.ViewVillainsListComponent0(this, 0);
     _el_0 = _compView_0.rootEl;
-    _VillainsService_0_4 = new import15.VillainsService();
-    _VillainsListComponent_0_5 = new import16.VillainsListComponent(_VillainsService_0_4);
-    _compView_0.create(_VillainsListComponent_0_5, []);
+    _VillainsService_0_5 = new import15.VillainsService();
+    _VillainsListComponent_0_6 = new import16.VillainsListComponent(_VillainsService_0_5);
+    _compView_0.create(_VillainsListComponent_0_6, []);
     init0(_el_0);
     return null;
   }
@@ -220,10 +210,7 @@ class _ViewAppComponent2 extends AppView<import1.AppComponent> {
   @override
   dynamic injectorGetInternal(dynamic token, int nodeIndex, dynamic notFoundResult) {
     if ((identical(token, import15.VillainsService) && (0 == nodeIndex))) {
-      return _VillainsService_0_4;
-    }
-    if ((identical(token, import16.VillainsListComponent) && (0 == nodeIndex))) {
-      return _VillainsListComponent_0_5;
+      return _VillainsService_0_5;
     }
     return notFoundResult;
   }
@@ -246,7 +233,7 @@ AppView<import1.AppComponent> viewFactory_AppComponent2(AppView<dynamic> parentV
 class _ViewAppComponent3 extends AppView<import1.AppComponent> {
   import2.Element _el_0;
   import17.ViewCarsComponent0 _compView_0;
-  import18.CarsComponent _CarsComponent_0_4;
+  import18.CarsComponent _CarsComponent_0_5;
   _ViewAppComponent3(AppView<dynamic> parentView, num parentIndex) : super(import6.ViewType.EMBEDDED, {}, parentView, parentIndex, ChangeDetectionStrategy.CheckAlways) {
     componentType = ViewAppComponent0._renderType;
   }
@@ -254,18 +241,10 @@ class _ViewAppComponent3 extends AppView<import1.AppComponent> {
   ComponentRef<import1.AppComponent> build() {
     _compView_0 = new import17.ViewCarsComponent0(this, 0);
     _el_0 = _compView_0.rootEl;
-    _CarsComponent_0_4 = new import18.CarsComponent();
-    _compView_0.create(_CarsComponent_0_4, []);
+    _CarsComponent_0_5 = new import18.CarsComponent();
+    _compView_0.create(_CarsComponent_0_5, []);
     init0(_el_0);
     return null;
-  }
-
-  @override
-  dynamic injectorGetInternal(dynamic token, int nodeIndex, dynamic notFoundResult) {
-    if ((identical(token, import18.CarsComponent) && (0 == nodeIndex))) {
-      return _CarsComponent_0_4;
-    }
-    return notFoundResult;
   }
 
   @override
@@ -287,66 +266,63 @@ const List<dynamic> styles$AppComponentHost = const [];
 
 class _ViewAppComponentHost0 extends AppView<dynamic> {
   ViewAppComponent0 _compView_0;
-  import1.AppComponent _AppComponent_0_4;
-  import19.EngineService __EngineService_0_5;
-  import19.TiresService __TiresService_0_6;
-  import19.CarService __CarService_0_7;
-  import13.HeroesService __HeroesService_0_8;
+  import1.AppComponent _AppComponent_0_5;
+  import19.EngineService __EngineService_0_6;
+  import19.TiresService __TiresService_0_7;
+  import19.CarService __CarService_0_8;
+  import13.HeroesService __HeroesService_0_9;
   _ViewAppComponentHost0(AppView<dynamic> parentView, num parentIndex) : super(import6.ViewType.HOST, {}, parentView, parentIndex, ChangeDetectionStrategy.CheckAlways);
-  import19.EngineService get _EngineService_0_5 {
-    if ((this.__EngineService_0_5 == null)) {
-      (__EngineService_0_5 = new import19.EngineService());
+  import19.EngineService get _EngineService_0_6 {
+    if ((this.__EngineService_0_6 == null)) {
+      (__EngineService_0_6 = new import19.EngineService());
     }
-    return this.__EngineService_0_5;
+    return this.__EngineService_0_6;
   }
 
-  import19.TiresService get _TiresService_0_6 {
-    if ((this.__TiresService_0_6 == null)) {
-      (__TiresService_0_6 = new import19.TiresService());
+  import19.TiresService get _TiresService_0_7 {
+    if ((this.__TiresService_0_7 == null)) {
+      (__TiresService_0_7 = new import19.TiresService());
     }
-    return this.__TiresService_0_6;
+    return this.__TiresService_0_7;
   }
 
-  import19.CarService get _CarService_0_7 {
-    if ((this.__CarService_0_7 == null)) {
-      (__CarService_0_7 = new import19.CarService(this._EngineService_0_5, this._TiresService_0_6));
+  import19.CarService get _CarService_0_8 {
+    if ((this.__CarService_0_8 == null)) {
+      (__CarService_0_8 = new import19.CarService(this._EngineService_0_6, this._TiresService_0_7));
     }
-    return this.__CarService_0_7;
+    return this.__CarService_0_8;
   }
 
-  import13.HeroesService get _HeroesService_0_8 {
-    if ((this.__HeroesService_0_8 == null)) {
-      (__HeroesService_0_8 = new import13.HeroesService());
+  import13.HeroesService get _HeroesService_0_9 {
+    if ((this.__HeroesService_0_9 == null)) {
+      (__HeroesService_0_9 = new import13.HeroesService());
     }
-    return this.__HeroesService_0_8;
+    return this.__HeroesService_0_9;
   }
 
   @override
   ComponentRef build() {
     _compView_0 = new ViewAppComponent0(this, 0);
     rootEl = _compView_0.rootEl;
-    _AppComponent_0_4 = new import1.AppComponent();
-    _compView_0.create(_AppComponent_0_4, projectableNodes);
+    _AppComponent_0_5 = new import1.AppComponent();
+    _compView_0.create(_AppComponent_0_5, projectableNodes);
     init0(rootEl);
-    return new ComponentRef<import1.AppComponent>(0, this, rootEl, _AppComponent_0_4);
+    return new ComponentRef<import1.AppComponent>(0, this, rootEl, _AppComponent_0_5);
   }
 
   @override
   dynamic injectorGetInternal(dynamic token, int nodeIndex, dynamic notFoundResult) {
-    if ((identical(token, import1.AppComponent) && (0 == nodeIndex))) {
-      return _AppComponent_0_4;
-    }
     if ((identical(token, import19.EngineService) && (0 == nodeIndex))) {
-      return _EngineService_0_5;
+      return _EngineService_0_6;
     }
     if ((identical(token, import19.TiresService) && (0 == nodeIndex))) {
-      return _TiresService_0_6;
+      return _TiresService_0_7;
     }
     if ((identical(token, import19.CarService) && (0 == nodeIndex))) {
-      return _CarService_0_7;
+      return _CarService_0_8;
     }
     if ((identical(token, import13.HeroesService) && (0 == nodeIndex))) {
-      return _HeroesService_0_8;
+      return _HeroesService_0_9;
     }
     return notFoundResult;
   }

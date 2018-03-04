@@ -1,7 +1,5 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
-
 // **************************************************************************
-// Generator: TemplateGenerator
+// Generator: Instance of 'Compiler'
 // **************************************************************************
 
 // ignore_for_file: cancel_subscriptions,constant_identifier_names,duplicate_import,non_constant_identifier_names,library_prefixes,UNUSED_IMPORT,UNUSED_SHOWN_NAME
@@ -42,9 +40,9 @@ class ViewHeroesListComponent0 extends AppView<import1.HeroesListComponent> {
   import2.Element _el_1;
   import2.UListElement _el_3;
   ViewContainer _appEl_4;
-  import4.NgFor _NgFor_4_7;
+  import4.NgFor _NgFor_4_9;
   ViewContainer _appEl_5;
-  import4.NgFor _NgFor_5_7;
+  import4.NgFor _NgFor_5_9;
   var _expr_0;
   import5.AsyncPipe _pipe_async_0;
   static RenderComponentType _renderType;
@@ -68,13 +66,13 @@ class ViewHeroesListComponent0 extends AppView<import1.HeroesListComponent> {
     var _anchor_4 = ngAnchor.clone(false);
     _el_3.append(_anchor_4);
     _appEl_4 = new ViewContainer(4, 3, this, _anchor_4);
-    TemplateRef _TemplateRef_4_6 = new TemplateRef(_appEl_4, viewFactory_HeroesListComponent1);
-    _NgFor_4_7 = new import4.NgFor(_appEl_4, _TemplateRef_4_6);
+    TemplateRef _TemplateRef_4_8 = new TemplateRef(_appEl_4, viewFactory_HeroesListComponent1);
+    _NgFor_4_9 = new import4.NgFor(_appEl_4, _TemplateRef_4_8);
     var _anchor_5 = ngAnchor.clone(false);
     _el_0.append(_anchor_5);
     _appEl_5 = new ViewContainer(5, 0, this, _anchor_5);
-    TemplateRef _TemplateRef_5_6 = new TemplateRef(_appEl_5, viewFactory_HeroesListComponent2);
-    _NgFor_5_7 = new import4.NgFor(_appEl_5, _TemplateRef_5_6);
+    TemplateRef _TemplateRef_5_8 = new TemplateRef(_appEl_5, viewFactory_HeroesListComponent2);
+    _NgFor_5_9 = new import4.NgFor(_appEl_5, _TemplateRef_5_8);
     _pipe_async_0 = new import5.AsyncPipe(ref);
     init(const [], null);
     return null;
@@ -86,16 +84,16 @@ class ViewHeroesListComponent0 extends AppView<import1.HeroesListComponent> {
     bool firstCheck = (this.cdState == 0);
     final currVal_0 = _pipe_async_0.transform(_ctx.heroes);
     if (!identical(_expr_0, currVal_0)) {
-      _NgFor_4_7.ngForOf = currVal_0;
+      _NgFor_4_9.ngForOf = currVal_0;
       _expr_0 = currVal_0;
     }
-    _NgFor_4_7.ngDoCheck();
+    _NgFor_4_9.ngDoCheck();
     if (firstCheck) {
       if (!identical(_ctx.selectedTaxReturns, null)) {
-        (_NgFor_5_7.ngForOf = _ctx.selectedTaxReturns);
+        (_NgFor_5_9.ngForOf = _ctx.selectedTaxReturns);
       }
     }
-    _NgFor_5_7.ngDoCheck();
+    _NgFor_5_9.ngDoCheck();
     _appEl_4.detectChangesInNestedViews();
     _appEl_5.detectChangesInNestedViews();
   }
@@ -154,8 +152,8 @@ AppView<import1.HeroesListComponent> viewFactory_HeroesListComponent1(AppView<dy
 class _ViewHeroesListComponent2 extends AppView<import1.HeroesListComponent> {
   import2.Element _el_0;
   import12.ViewHeroTaxReturnComponent0 _compView_0;
-  import13.HeroTaxReturnService _HeroTaxReturnService_0_4;
-  import14.HeroTaxReturnComponent _HeroTaxReturnComponent_0_5;
+  import13.HeroTaxReturnService _HeroTaxReturnService_0_5;
+  import14.HeroTaxReturnComponent _HeroTaxReturnComponent_0_6;
   var _expr_0;
   _ViewHeroesListComponent2(AppView<dynamic> parentView, num parentIndex) : super(import7.ViewType.EMBEDDED, {'\$implicit': null, 'index': null}, parentView, parentIndex, ChangeDetectionStrategy.CheckAlways) {
     componentType = ViewHeroesListComponent0._renderType;
@@ -165,10 +163,10 @@ class _ViewHeroesListComponent2 extends AppView<import1.HeroesListComponent> {
     _compView_0 = new import12.ViewHeroTaxReturnComponent0(this, 0);
     _el_0 = _compView_0.rootEl;
     addShimC(_el_0);
-    _HeroTaxReturnService_0_4 = new import13.HeroTaxReturnService(parentView.parentView.injectorGet(import15.HeroesService, parentView.viewData.parentIndex));
-    _HeroTaxReturnComponent_0_5 = new import14.HeroTaxReturnComponent(_HeroTaxReturnService_0_4);
-    _compView_0.create(_HeroTaxReturnComponent_0_5, []);
-    final subscription_0 = _HeroTaxReturnComponent_0_5.close.listen(eventHandler1(_handle_close_0_0));
+    _HeroTaxReturnService_0_5 = new import13.HeroTaxReturnService(parentView.parentView.injectorGet(import15.HeroesService, parentView.viewData.parentIndex));
+    _HeroTaxReturnComponent_0_6 = new import14.HeroTaxReturnComponent(_HeroTaxReturnService_0_5);
+    _compView_0.create(_HeroTaxReturnComponent_0_6, []);
+    final subscription_0 = _HeroTaxReturnComponent_0_6.close.listen(eventHandler1(_handle_close_0_0));
     init([_el_0], [subscription_0]);
     return null;
   }
@@ -176,10 +174,7 @@ class _ViewHeroesListComponent2 extends AppView<import1.HeroesListComponent> {
   @override
   dynamic injectorGetInternal(dynamic token, int nodeIndex, dynamic notFoundResult) {
     if ((identical(token, import13.HeroTaxReturnService) && (0 == nodeIndex))) {
-      return _HeroTaxReturnService_0_4;
-    }
-    if ((identical(token, import14.HeroTaxReturnComponent) && (0 == nodeIndex))) {
-      return _HeroTaxReturnComponent_0_5;
+      return _HeroTaxReturnService_0_5;
     }
     return notFoundResult;
   }
@@ -189,7 +184,7 @@ class _ViewHeroesListComponent2 extends AppView<import1.HeroesListComponent> {
     final import16.HeroTaxReturn local_selected = locals['\$implicit'];
     final currVal_0 = local_selected;
     if (!identical(_expr_0, currVal_0)) {
-      _HeroTaxReturnComponent_0_5.taxReturn = currVal_0;
+      _HeroTaxReturnComponent_0_6.taxReturn = currVal_0;
       _expr_0 = currVal_0;
     }
     _compView_0.detectChanges();
@@ -214,24 +209,16 @@ const List<dynamic> styles$HeroesListComponentHost = const [];
 
 class _ViewHeroesListComponentHost0 extends AppView<dynamic> {
   ViewHeroesListComponent0 _compView_0;
-  import1.HeroesListComponent _HeroesListComponent_0_4;
+  import1.HeroesListComponent _HeroesListComponent_0_5;
   _ViewHeroesListComponentHost0(AppView<dynamic> parentView, num parentIndex) : super(import7.ViewType.HOST, {}, parentView, parentIndex, ChangeDetectionStrategy.CheckAlways);
   @override
   ComponentRef build() {
     _compView_0 = new ViewHeroesListComponent0(this, 0);
     rootEl = _compView_0.rootEl;
-    _HeroesListComponent_0_4 = new import1.HeroesListComponent(this.injectorGet(import15.HeroesService, viewData.parentIndex));
-    _compView_0.create(_HeroesListComponent_0_4, projectableNodes);
+    _HeroesListComponent_0_5 = new import1.HeroesListComponent(this.injectorGet(import15.HeroesService, viewData.parentIndex));
+    _compView_0.create(_HeroesListComponent_0_5, projectableNodes);
     init0(rootEl);
-    return new ComponentRef<import1.HeroesListComponent>(0, this, rootEl, _HeroesListComponent_0_4);
-  }
-
-  @override
-  dynamic injectorGetInternal(dynamic token, int nodeIndex, dynamic notFoundResult) {
-    if ((identical(token, import1.HeroesListComponent) && (0 == nodeIndex))) {
-      return _HeroesListComponent_0_4;
-    }
-    return notFoundResult;
+    return new ComponentRef<import1.HeroesListComponent>(0, this, rootEl, _HeroesListComponent_0_5);
   }
 
   @override

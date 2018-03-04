@@ -1,7 +1,5 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
-
 // **************************************************************************
-// Generator: TemplateGenerator
+// Generator: Instance of 'Compiler'
 // **************************************************************************
 
 // ignore_for_file: cancel_subscriptions,constant_identifier_names,duplicate_import,non_constant_identifier_names,library_prefixes,UNUSED_IMPORT,UNUSED_SHOWN_NAME
@@ -23,17 +21,18 @@ import 'hero_tax_return_component.dart' as import2;
 import 'dart:html' as import3;
 import 'package:angular_forms/src/directives/default_value_accessor.dart' as import4;
 import 'package:angular_forms/src/directives/number_value_accessor.dart' as import5;
-import 'package:angular_forms/src/directives/ng_model.dart' as import6;
+import 'package:angular_forms/src/directives/control_value_accessor.dart' as import6;
+import 'package:angular_forms/src/directives/ng_model.dart' as import7;
 import 'package:angular/src/core/render/api.dart';
-import 'package:angular/src/core/linker/view_type.dart' as import8;
+import 'package:angular/src/core/linker/view_type.dart' as import9;
 import 'package:angular/src/core/change_detection/change_detection.dart';
-import 'package:angular/src/core/linker/app_view_utils.dart' as import10;
+import 'package:angular/src/core/linker/app_view_utils.dart' as import11;
 import 'package:angular/angular.dart';
-import 'package:angular/src/core/di/opaque_token.dart' as import12;
-import 'package:angular_forms/src/directives/control_value_accessor.dart' as import13;
-import 'package:angular_forms/src/directives/ng_control.dart' as import14;
-import 'hero_tax_return_service.dart' as import15;
-import 'heroes_service.dart' as import16;
+import 'package:angular/src/core/di/opaque_token.dart' as import13;
+import 'package:angular_forms/src/directives/control_value_accessor.dart' as import14;
+import 'package:angular_forms/src/directives/ng_control.dart' as import15;
+import 'hero_tax_return_service.dart' as import16;
+import 'heroes_service.dart' as import17;
 
 const List<dynamic> styles$HeroTaxReturnComponent = const [import0.styles];
 
@@ -49,10 +48,10 @@ class ViewHeroTaxReturnComponent0 extends AppView<import2.HeroTaxReturnComponent
   import3.Element _el_9;
   import3.Element _el_10;
   import3.InputElement _el_12;
-  import4.DefaultValueAccessor _DefaultValueAccessor_12_4;
-  import5.NumberValueAccessor _NumberValueAccessor_12_5;
-  List<dynamic> _NgValueAccessor_12_6;
-  import6.NgModel _NgModel_12_7;
+  import4.DefaultValueAccessor _DefaultValueAccessor_12_5;
+  import5.NumberValueAccessor _NumberValueAccessor_12_6;
+  List<import6.ControlValueAccessor<dynamic>> _NgValueAccessor_12_7;
+  import7.NgModel _NgModel_12_8;
   import3.Element _el_13;
   import3.Element _el_14;
   import3.Text _text_16;
@@ -66,9 +65,9 @@ class ViewHeroTaxReturnComponent0 extends AppView<import2.HeroTaxReturnComponent
   var _expr_3;
   var _expr_5;
   static RenderComponentType _renderType;
-  ViewHeroTaxReturnComponent0(AppView<dynamic> parentView, num parentIndex) : super(import8.ViewType.COMPONENT, {}, parentView, parentIndex, ChangeDetectionStrategy.CheckAlways) {
+  ViewHeroTaxReturnComponent0(AppView<dynamic> parentView, num parentIndex) : super(import9.ViewType.COMPONENT, {}, parentView, parentIndex, ChangeDetectionStrategy.CheckAlways) {
     rootEl = import3.document.createElement('hero-tax-return');
-    _renderType ??= import10.appViewUtils.createRenderType('', ViewEncapsulation.Emulated, styles$HeroTaxReturnComponent);
+    _renderType ??= import11.appViewUtils.createRenderType('', ViewEncapsulation.Emulated, styles$HeroTaxReturnComponent);
     setupComponentType(_renderType);
   }
   @override
@@ -107,10 +106,10 @@ class ViewHeroTaxReturnComponent0 extends AppView<import2.HeroTaxReturnComponent
     _el_12.className = 'num';
     createAttr(_el_12, 'type', 'number');
     addShimC(_el_12);
-    _DefaultValueAccessor_12_4 = new import4.DefaultValueAccessor(_el_12);
-    _NumberValueAccessor_12_5 = new import5.NumberValueAccessor(_el_12);
-    _NgValueAccessor_12_6 = [_DefaultValueAccessor_12_4, _NumberValueAccessor_12_5];
-    _NgModel_12_7 = new import6.NgModel(null, _NgValueAccessor_12_6);
+    _DefaultValueAccessor_12_5 = new import4.DefaultValueAccessor(_el_12);
+    _NumberValueAccessor_12_6 = new import5.NumberValueAccessor(_el_12);
+    _NgValueAccessor_12_7 = [_DefaultValueAccessor_12_5, _NumberValueAccessor_12_6];
+    _NgModel_12_8 = new import7.NgModel(null, _NgValueAccessor_12_7);
     _el_13 = createAndAppend(doc, 'fieldset', _el_0);
     addShimE(_el_13);
     _el_14 = createAndAppend(doc, 'label', _el_13);
@@ -136,7 +135,7 @@ class ViewHeroTaxReturnComponent0 extends AppView<import2.HeroTaxReturnComponent
     _el_12.addEventListener('input', eventHandler1(_handle_input_12_1));
     _el_12.addEventListener('blur', eventHandler1(_handle_blur_12_2));
     _el_12.addEventListener('change', eventHandler1(_handle_change_12_3));
-    final subscription_0 = _NgModel_12_7.update.listen(eventHandler1(_handle_ngModelChange_12_0));
+    final subscription_0 = _NgModel_12_8.update.listen(eventHandler1(_handle_ngModelChange_12_0));
     _el_18.addEventListener('click', eventHandler0(ctx.onSaved));
     _el_20.addEventListener('click', eventHandler0(ctx.onCanceled));
     _el_22.addEventListener('click', eventHandler0(ctx.onClose));
@@ -147,16 +146,16 @@ class ViewHeroTaxReturnComponent0 extends AppView<import2.HeroTaxReturnComponent
   @override
   dynamic injectorGetInternal(dynamic token, int nodeIndex, dynamic notFoundResult) {
     if ((identical(token, import4.DefaultValueAccessor) && (12 == nodeIndex))) {
-      return _DefaultValueAccessor_12_4;
+      return _DefaultValueAccessor_12_5;
     }
     if ((identical(token, import5.NumberValueAccessor) && (12 == nodeIndex))) {
-      return _NumberValueAccessor_12_5;
+      return _NumberValueAccessor_12_6;
     }
-    if ((identical(token, const import12.OpaqueToken<import13.ControlValueAccessor<dynamic>>('NgValueAccessor')) && (12 == nodeIndex))) {
-      return _NgValueAccessor_12_6;
+    if ((identical(token, const import13.MultiToken<import14.ControlValueAccessor>('NgValueAccessor')) && (12 == nodeIndex))) {
+      return _NgValueAccessor_12_7;
     }
-    if (((identical(token, import6.NgModel) || identical(token, import14.NgControl)) && (12 == nodeIndex))) {
-      return _NgModel_12_7;
+    if (((identical(token, import7.NgModel) || identical(token, import15.NgControl)) && (12 == nodeIndex))) {
+      return _NgModel_12_8;
     }
     return notFoundResult;
   }
@@ -167,10 +166,10 @@ class ViewHeroTaxReturnComponent0 extends AppView<import2.HeroTaxReturnComponent
     bool changed = false;
     bool firstCheck = (this.cdState == 0);
     changed = false;
-    _NgModel_12_7.model = _ctx.taxReturn.income;
-    _NgModel_12_7.ngAfterChanges();
+    _NgModel_12_8.model = _ctx.taxReturn.income;
+    _NgModel_12_8.ngAfterChanges();
     if (firstCheck) {
-      _NgModel_12_7.ngOnInit();
+      _NgModel_12_8.ngOnInit();
     }
     final currVal_0 = identical(_ctx.message, 'Canceled');
     if (!identical(_expr_0, currVal_0)) {
@@ -182,17 +181,17 @@ class ViewHeroTaxReturnComponent0 extends AppView<import2.HeroTaxReturnComponent
       _text_2.text = currVal_1;
       _expr_1 = currVal_1;
     }
-    final currVal_2 = import10.interpolate0(_ctx.taxReturn.name);
+    final currVal_2 = import11.interpolate0(_ctx.taxReturn.name);
     if (!identical(_expr_2, currVal_2)) {
       _text_5.text = currVal_2;
       _expr_2 = currVal_2;
     }
-    final currVal_3 = import10.interpolate0(_ctx.taxReturn.taxId);
+    final currVal_3 = import11.interpolate0(_ctx.taxReturn.taxId);
     if (!identical(_expr_3, currVal_3)) {
       _text_8.text = currVal_3;
       _expr_3 = currVal_3;
     }
-    final currVal_5 = import10.interpolate0(_ctx.taxReturn.tax);
+    final currVal_5 = import11.interpolate0(_ctx.taxReturn.tax);
     if (!identical(_expr_5, currVal_5)) {
       _text_16.text = currVal_5;
       _expr_5 = currVal_5;
@@ -204,17 +203,17 @@ class ViewHeroTaxReturnComponent0 extends AppView<import2.HeroTaxReturnComponent
   }
 
   void _handle_input_12_1($event) {
-    _DefaultValueAccessor_12_4.onChange($event.target.value);
-    _NumberValueAccessor_12_5.onChange($event.target.value);
+    _DefaultValueAccessor_12_5.onChange($event.target.value);
+    _NumberValueAccessor_12_6.onChange($event.target.value);
   }
 
   void _handle_blur_12_2($event) {
-    _DefaultValueAccessor_12_4.touchHandler();
-    _NumberValueAccessor_12_5.touchHandler();
+    _DefaultValueAccessor_12_5.touchHandler();
+    _NumberValueAccessor_12_6.touchHandler();
   }
 
   void _handle_change_12_3($event) {
-    _NumberValueAccessor_12_5.onChange($event.target.value);
+    _NumberValueAccessor_12_6.onChange($event.target.value);
   }
 }
 
@@ -226,27 +225,24 @@ const List<dynamic> styles$HeroTaxReturnComponentHost = const [];
 
 class _ViewHeroTaxReturnComponentHost0 extends AppView<dynamic> {
   ViewHeroTaxReturnComponent0 _compView_0;
-  import15.HeroTaxReturnService _HeroTaxReturnService_0_4;
-  import2.HeroTaxReturnComponent _HeroTaxReturnComponent_0_5;
-  _ViewHeroTaxReturnComponentHost0(AppView<dynamic> parentView, num parentIndex) : super(import8.ViewType.HOST, {}, parentView, parentIndex, ChangeDetectionStrategy.CheckAlways);
+  import16.HeroTaxReturnService _HeroTaxReturnService_0_5;
+  import2.HeroTaxReturnComponent _HeroTaxReturnComponent_0_6;
+  _ViewHeroTaxReturnComponentHost0(AppView<dynamic> parentView, num parentIndex) : super(import9.ViewType.HOST, {}, parentView, parentIndex, ChangeDetectionStrategy.CheckAlways);
   @override
   ComponentRef build() {
     _compView_0 = new ViewHeroTaxReturnComponent0(this, 0);
     rootEl = _compView_0.rootEl;
-    _HeroTaxReturnService_0_4 = new import15.HeroTaxReturnService(this.injectorGet(import16.HeroesService, viewData.parentIndex));
-    _HeroTaxReturnComponent_0_5 = new import2.HeroTaxReturnComponent(_HeroTaxReturnService_0_4);
-    _compView_0.create(_HeroTaxReturnComponent_0_5, projectableNodes);
+    _HeroTaxReturnService_0_5 = new import16.HeroTaxReturnService(this.injectorGet(import17.HeroesService, viewData.parentIndex));
+    _HeroTaxReturnComponent_0_6 = new import2.HeroTaxReturnComponent(_HeroTaxReturnService_0_5);
+    _compView_0.create(_HeroTaxReturnComponent_0_6, projectableNodes);
     init0(rootEl);
-    return new ComponentRef<import2.HeroTaxReturnComponent>(0, this, rootEl, _HeroTaxReturnComponent_0_5);
+    return new ComponentRef<import2.HeroTaxReturnComponent>(0, this, rootEl, _HeroTaxReturnComponent_0_6);
   }
 
   @override
   dynamic injectorGetInternal(dynamic token, int nodeIndex, dynamic notFoundResult) {
-    if ((identical(token, import15.HeroTaxReturnService) && (0 == nodeIndex))) {
-      return _HeroTaxReturnService_0_4;
-    }
-    if ((identical(token, import2.HeroTaxReturnComponent) && (0 == nodeIndex))) {
-      return _HeroTaxReturnComponent_0_5;
+    if ((identical(token, import16.HeroTaxReturnService) && (0 == nodeIndex))) {
+      return _HeroTaxReturnService_0_5;
     }
     return notFoundResult;
   }

@@ -1,7 +1,5 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
-
 // **************************************************************************
-// Generator: TemplateGenerator
+// Generator: Instance of 'Compiler'
 // **************************************************************************
 
 // ignore_for_file: cancel_subscriptions,constant_identifier_names,duplicate_import,non_constant_identifier_names,library_prefixes,UNUSED_IMPORT,UNUSED_SHOWN_NAME
@@ -34,7 +32,7 @@ class ViewVillainsListComponent0 extends AppView<import1.VillainsListComponent> 
   import2.Element _el_1;
   import2.UListElement _el_3;
   ViewContainer _appEl_4;
-  import4.NgFor _NgFor_4_7;
+  import4.NgFor _NgFor_4_9;
   var _expr_0;
   import5.AsyncPipe _pipe_async_0;
   static RenderComponentType _renderType;
@@ -55,8 +53,8 @@ class ViewVillainsListComponent0 extends AppView<import1.VillainsListComponent> 
     var _anchor_4 = ngAnchor.clone(false);
     _el_3.append(_anchor_4);
     _appEl_4 = new ViewContainer(4, 3, this, _anchor_4);
-    TemplateRef _TemplateRef_4_6 = new TemplateRef(_appEl_4, viewFactory_VillainsListComponent1);
-    _NgFor_4_7 = new import4.NgFor(_appEl_4, _TemplateRef_4_6);
+    TemplateRef _TemplateRef_4_8 = new TemplateRef(_appEl_4, viewFactory_VillainsListComponent1);
+    _NgFor_4_9 = new import4.NgFor(_appEl_4, _TemplateRef_4_8);
     _pipe_async_0 = new import5.AsyncPipe(ref);
     init(const [], null);
     return null;
@@ -67,10 +65,10 @@ class ViewVillainsListComponent0 extends AppView<import1.VillainsListComponent> 
     final import1.VillainsListComponent _ctx = ctx;
     final currVal_0 = _pipe_async_0.transform(_ctx.villains);
     if (!identical(_expr_0, currVal_0)) {
-      _NgFor_4_7.ngForOf = currVal_0;
+      _NgFor_4_9.ngForOf = currVal_0;
       _expr_0 = currVal_0;
     }
-    _NgFor_4_7.ngDoCheck();
+    _NgFor_4_9.ngDoCheck();
     _appEl_4.detectChangesInNestedViews();
   }
 
@@ -121,27 +119,24 @@ const List<dynamic> styles$VillainsListComponentHost = const [];
 
 class _ViewVillainsListComponentHost0 extends AppView<dynamic> {
   ViewVillainsListComponent0 _compView_0;
-  import12.VillainsService _VillainsService_0_4;
-  import1.VillainsListComponent _VillainsListComponent_0_5;
+  import12.VillainsService _VillainsService_0_5;
+  import1.VillainsListComponent _VillainsListComponent_0_6;
   _ViewVillainsListComponentHost0(AppView<dynamic> parentView, num parentIndex) : super(import7.ViewType.HOST, {}, parentView, parentIndex, ChangeDetectionStrategy.CheckAlways);
   @override
   ComponentRef build() {
     _compView_0 = new ViewVillainsListComponent0(this, 0);
     rootEl = _compView_0.rootEl;
-    _VillainsService_0_4 = new import12.VillainsService();
-    _VillainsListComponent_0_5 = new import1.VillainsListComponent(_VillainsService_0_4);
-    _compView_0.create(_VillainsListComponent_0_5, projectableNodes);
+    _VillainsService_0_5 = new import12.VillainsService();
+    _VillainsListComponent_0_6 = new import1.VillainsListComponent(_VillainsService_0_5);
+    _compView_0.create(_VillainsListComponent_0_6, projectableNodes);
     init0(rootEl);
-    return new ComponentRef<import1.VillainsListComponent>(0, this, rootEl, _VillainsListComponent_0_5);
+    return new ComponentRef<import1.VillainsListComponent>(0, this, rootEl, _VillainsListComponent_0_6);
   }
 
   @override
   dynamic injectorGetInternal(dynamic token, int nodeIndex, dynamic notFoundResult) {
     if ((identical(token, import12.VillainsService) && (0 == nodeIndex))) {
-      return _VillainsService_0_4;
-    }
-    if ((identical(token, import1.VillainsListComponent) && (0 == nodeIndex))) {
-      return _VillainsListComponent_0_5;
+      return _VillainsService_0_5;
     }
     return notFoundResult;
   }
