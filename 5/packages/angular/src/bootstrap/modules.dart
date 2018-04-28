@@ -11,7 +11,6 @@ import 'package:angular/src/core/application_tokens.dart';
 import 'package:angular/src/core/di.dart';
 import 'package:angular/src/core/linker/app_view_utils.dart';
 import 'package:angular/src/core/linker/component_loader.dart';
-import 'package:angular/src/core/linker/component_resolver.dart';
 import 'package:angular/src/core/linker/dynamic_component_loader.dart';
 import 'package:angular/src/core/testability/testability.dart';
 import 'package:angular/src/core/zone.dart';
@@ -51,6 +50,30 @@ List<EventManagerPlugin> createEventPlugins() {
   ];
 }
 
+/// Implementation of [SlowComponentLoader] that throws [UnsupportedError].
+///
+/// This is to allow a migration path for common components that may need to
+/// inject [SlowComponentLoader] for the legacy `bootstrapStatic` method, but
+/// won't actually use it in apps that called `bootstrapFactory`.
+class ThrowingSlowComponentLoader implements SlowComponentLoader {
+  static const _slowComponentLoaderWarning =
+      'You are using runApp or runAppAsync, which does not support loading a '
+      'component with SlowComponentLoader. Please migrate this code to use '
+      'ComponentLoader instead.';
+
+  const ThrowingSlowComponentLoader();
+
+  @override
+  load<T>(_, __) {
+    throw new UnsupportedError(_slowComponentLoaderWarning);
+  }
+
+  @override
+  loadNextToLocation<T>(_, __, [___]) {
+    throw new UnsupportedError(_slowComponentLoaderWarning);
+  }
+}
+
 /// Strict subset module of AngularDart functionality.
 ///
 /// Does not support any service that requires the `initReflector()`-based APIs.
@@ -64,14 +87,13 @@ const bootstrapMinimalModule = const <Object>[
   const Provider(DomSanitizationService, useClass: DomSanitizationServiceImpl),
 
   // Core components of the runtime.
-  const Provider(ApplicationRef, useClass: ApplicationRefImpl),
   const Provider(NgZone, useFactory: createNgZone, deps: const []),
   const Provider(APP_ID, useFactory: createRandomAppId, deps: const []),
-  const Provider(AppViewUtils),
   const Provider(ComponentLoader),
+  const Provider(SlowComponentLoader, useClass: ThrowingSlowComponentLoader),
 
-  // Disable Testability.
-  const Provider(Testability, useValue: null),
+  // Enable Testability.
+  const Provider(Testability, useClass: Testability),
 ];
 
 /// An experimental application [Injector] that is statically generated.
@@ -99,7 +121,7 @@ String createRandomAppId() {
 @experimental
 const bootstrapLegacyModule = const <Object>[
   bootstrapMinimalModule,
-  const Provider(ComponentResolver, useClass: ComponentResolver),
+  const Provider(ApplicationRef, useClass: ApplicationRefImpl),
+  const Provider(AppViewUtils),
   const Provider(SlowComponentLoader),
-  const Provider(Testability, useClass: Testability),
 ];

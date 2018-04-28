@@ -13,12 +13,10 @@ import 'generator.dart';
 import 'library.dart';
 import 'utils.dart';
 
-typedef String _OutputFormatter(String code);
-
 /// A [Builder] wrapping on one or more [Generator]s.
 class _Builder extends Builder {
   /// Function that determines how the generated code is formatted.
-  final _OutputFormatter formatOutput;
+  final String Function(String) formatOutput;
 
   /// The generators run for each targeted library.
   final List<Generator> _generators;
@@ -29,24 +27,17 @@ class _Builder extends Builder {
   /// Whether to emit a standalone (non-`part`) file in this builder.
   final bool _isStandalone;
 
-  final bool _requireLibraryDirective;
-
   final String _header;
 
   @override
   final Map<String, List<String>> buildExtensions;
 
   /// Wrap [_generators] to form a [Builder]-compatible API.
-  _Builder(
-      this._generators,
+  _Builder(this._generators,
       {String formatOutput(String code),
       String generatedExtension: '.g.dart',
       List<String> additionalOutputExtensions: const [],
       bool isStandalone: false,
-      @Deprecated(
-          'Library directives are no longer required for part generation. '
-          'This option will be removed in v0.8.0.')
-          bool requireLibraryDirective: false,
       String header})
       : _generatedExtension = generatedExtension,
         buildExtensions = {
@@ -54,8 +45,6 @@ class _Builder extends Builder {
         },
         _isStandalone = isStandalone,
         formatOutput = formatOutput ?? _formatter.format,
-        // ignore: deprecated_member_use
-        _requireLibraryDirective = requireLibraryDirective,
         _header = header ?? defaultFileHeader {
     if (_generatedExtension == null) {
       throw new ArgumentError.notNull('generatedExtension');
@@ -64,7 +53,7 @@ class _Builder extends Builder {
       throw new ArgumentError.value(_generatedExtension, 'generatedExtension',
           'Extension must be in the format of .*');
     }
-    if (this._isStandalone && this._generators.length > 1) {
+    if (_isStandalone && _generators.length > 1) {
       throw new ArgumentError(
           'A standalone file can only be generated from a single Generator.');
     }
@@ -83,7 +72,6 @@ class _Builder extends Builder {
 
   Future _generateForLibrary(
       LibraryElement library, BuildStep buildStep) async {
-    log.fine('Running $_generators for ${buildStep.inputId}');
     var generatedOutputs =
         await _generate(library, _generators, buildStep).toList();
 
@@ -103,11 +91,7 @@ class _Builder extends Builder {
 
     if (!_isStandalone) {
       var asset = buildStep.inputId;
-      var name = nameOfPartial(
-        library,
-        asset,
-        allowUnnamedPartials: !_requireLibraryDirective,
-      );
+      var name = nameOfPartial(library, asset);
       if (name == null) {
         var suggest = suggestLibraryName(asset);
         throw new InvalidGenerationSourceError(
@@ -125,14 +109,14 @@ class _Builder extends Builder {
       contentBuffer.writeln();
     }
 
-    for (GeneratedOutput output in generatedOutputs) {
-      contentBuffer.writeln('');
-      contentBuffer.writeln(_headerLine);
-      contentBuffer.writeln('// Generator: ${output.generator}');
-      contentBuffer.writeln(_headerLine);
-      contentBuffer.writeln('');
-
-      contentBuffer.writeln(output.output);
+    for (var output in generatedOutputs) {
+      contentBuffer
+        ..writeln('')
+        ..writeln(_headerLine)
+        ..writeln('// Generator: ${output.generator}')
+        ..writeln(_headerLine)
+        ..writeln('')
+        ..writeln(output.output);
     }
 
     var genPartContent = contentBuffer.toString();
@@ -176,32 +160,15 @@ class PartBuilder extends _Builder {
   /// [header] is used to specify the content at the top of each generated file.
   /// If `null`, the content of [defaultFileHeader] is used.
   /// If [header] is an empty `String` no header is added.
-  ///
-  /// May set [requireLibraryDirective] to `true` in order to opt-out of the
-  /// Dart `2.0.0-dev` feature of `part of` being usable without an explicit
-  /// `library` directive. Developers should restrict their `pubspec`
-  /// accordingly:
-  /// ```yaml
-  /// sdk: '>=2.0.0-dev <2.0.0'
-  /// ```
-  ///
-  /// This option will be removed in version 0.8.0 of `source_gen`.
-  PartBuilder(
-      List<Generator> generators,
+  PartBuilder(List<Generator> generators,
       {String formatOutput(String code),
       String generatedExtension: '.g.dart',
       List<String> additionalOutputExtensions: const [],
-      @Deprecated(
-          'Library directives are no longer required for part generation. '
-          'This option will be removed in v0.8.0.')
-          bool requireLibraryDirective: false,
       String header})
       : super(generators,
             formatOutput: formatOutput,
             generatedExtension: generatedExtension,
             additionalOutputExtensions: additionalOutputExtensions,
-            // ignore: deprecated_member_use
-            requireLibraryDirective: requireLibraryDirective,
             header: header);
 }
 
@@ -214,11 +181,12 @@ class LibraryBuilder extends _Builder {
   /// outputs through the [BuildStep] they should be indicated in
   /// [additionalOutputExtensions].
   ///
-  /// If `null`, the content of [defaultFileHeader] is used.
-  /// If [header] is an empty `String` no header is added.
-  ///
   /// [formatOutput] is called to format the generated code. Defaults to
   /// [DartFormatter.format].
+  ///
+  /// [header] is used to specify the content at the top of each generated file.
+  /// If `null`, the content of [defaultFileHeader] is used.
+  /// If [header] is an empty `String` no header is added.
   LibraryBuilder(Generator generator,
       {String formatOutput(String code),
       String generatedExtension: '.g.dart',
@@ -235,16 +203,21 @@ class LibraryBuilder extends _Builder {
 Stream<GeneratedOutput> _generate(LibraryElement library,
     List<Generator> generators, BuildStep buildStep) async* {
   var libraryReader = new LibraryReader(library);
-  for (var gen in generators) {
+  for (var i = 0; i < generators.length; i++) {
+    var gen = generators[i];
     try {
-      log.finer('Running $gen for ${buildStep.inputId}');
+      var msg = 'Running $gen';
+      if (generators.length > 1) {
+        msg = '$msg - ${i+1} of ${generators.length}';
+      }
+      log.fine(msg);
       var createdUnit = await gen.generate(libraryReader, buildStep);
 
       if (createdUnit != null && createdUnit.isNotEmpty) {
         yield new GeneratedOutput(gen, createdUnit);
       }
     } catch (e, stack) {
-      log.severe('Error running $gen for ${buildStep.inputId}.', e, stack);
+      log.severe('Error running $gen', e, stack);
       yield new GeneratedOutput.fromError(gen, e, stack);
     }
   }

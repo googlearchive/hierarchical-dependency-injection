@@ -7,39 +7,6 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
 import 'package:path/path.dart' as p;
 
-String friendlyNameForElement(Element element) {
-  var friendlyName = element.displayName;
-
-  if (friendlyName == null) {
-    throw new ArgumentError(
-        'Cannot get friendly name for $element - ${element.runtimeType}.');
-  }
-
-  var names = <String>[friendlyName];
-  if (element is ClassElement) {
-    names.insert(0, 'class');
-    if (element.isAbstract) {
-      names.insert(0, 'abstract');
-    }
-  }
-  if (element is VariableElement) {
-    names.insert(0, element.type.toString());
-
-    if (element.isConst) {
-      names.insert(0, 'const');
-    }
-
-    if (element.isFinal) {
-      names.insert(0, 'final');
-    }
-  }
-  if (element is LibraryElement) {
-    names.insert(0, 'library');
-  }
-
-  return names.join(' ');
-}
-
 /// Returns a non-null name for the provided [type].
 ///
 /// In newer versions of the Dart analyzer, a `typedef` does not keep the
@@ -63,23 +30,13 @@ String typeNameOf(DartType type) {
 /// Returns a name suitable for `part of "..."` when pointing to [element].
 ///
 /// Returns `null` if [element] is missing identifier.
-///
-/// Starting in `1.25.0`, setting [allowUnnamedPartials] will fallback
-/// (actually, preferred) to `'part of "package:foo/path.dart'`, and null will
-/// never be returned.
-String nameOfPartial(
-  LibraryElement element,
-  AssetId source, {
-  bool allowUnnamedPartials: false,
-}) {
+String nameOfPartial(LibraryElement element, AssetId source) {
   if (element.name != null && element.name.isNotEmpty) {
     return element.name;
   }
-  if (allowUnnamedPartials) {
-    var sourceUrl = p.basename(source.uri.toString());
-    return '\'$sourceUrl\'';
-  }
-  return null;
+
+  var sourceUrl = p.basename(source.uri.toString());
+  return '\'$sourceUrl\'';
 }
 
 /// Returns a suggested library identifier based on [source] path and package.

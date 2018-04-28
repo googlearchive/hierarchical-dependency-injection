@@ -3,11 +3,14 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:core' as core;
+import 'dart:core';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:async/async.dart';
 import 'package:path/path.dart' as p;
+import 'package:pub_semver/pub_semver.dart';
 
 import '../backend/operating_system.dart';
 import '../backend/runtime.dart';
@@ -42,6 +45,9 @@ final int lineLength = () {
 
 /// The root directory of the Dart SDK.
 final String sdkDir = p.dirname(p.dirname(Platform.resolvedExecutable));
+
+/// The version of the Dart SDK on which test is running.
+final sdkVersion = new Version.parse(Platform.version.split(' ').first);
 
 /// Returns the current operating system.
 final OperatingSystem currentOS = (() {
@@ -171,10 +177,13 @@ String wordWrap(String text) {
 /// This automatically wraps lines if they get too long. If [color] is passed,
 /// it controls whether the warning header is color; otherwise, it defaults to
 /// [canUseSpecialChars].
-void warn(String message, {bool color}) {
+///
+/// If [print] is `true`, this prints the message using [print] to associate it
+/// with the current test. Otherwise, it prints it using [stderr].
+void warn(String message, {bool color, bool print: false}) {
   if (color == null) color = canUseSpecialChars;
   var header = color ? "\u001b[33mWarning:\u001b[0m" : "Warning:";
-  stderr.writeln(wordWrap("$header $message\n"));
+  (print ? core.print : stderr.writeln)(wordWrap("$header $message\n"));
 }
 
 /// Repeatedly finds a probably-unused port on localhost and passes it to
@@ -231,8 +240,9 @@ Future<Uri> getRemoteDebuggerUrl(Uri base) async {
     var client = new HttpClient();
     var request = await client.getUrl(base.resolve("/json/list"));
     var response = await request.close();
-    var json = await JSON.fuse(UTF8).decoder.bind(response).single as List;
-    return base.resolve(json.first["devtoolsFrontendUrl"]);
+    var jsonObject =
+        await json.fuse(utf8).decoder.bind(response).single as List;
+    return base.resolve(jsonObject.first["devtoolsFrontendUrl"]);
   } catch (_) {
     // If we fail to talk to the remote debugger protocol, give up and return
     // the raw URL rather than crashing.

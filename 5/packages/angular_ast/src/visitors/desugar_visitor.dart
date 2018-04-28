@@ -81,6 +81,7 @@ class DesugarVisitor implements TemplateAstVisitor<TemplateAst, String> {
           (starAst as ParsedStarAst).valueToken?.innerValue?.offset;
       var directiveName = starAst.name;
       EmbeddedTemplateAst newAst;
+      var attributesToAdd = <AttributeAst>[];
       var propertiesToAdd = <PropertyAst>[];
       var letBindingsToAdd = <LetBindingAst>[];
 
@@ -102,29 +103,41 @@ class DesugarVisitor implements TemplateAstVisitor<TemplateAst, String> {
           propertiesToAdd.addAll(micro.properties);
           letBindingsToAdd.addAll(micro.letBindings);
         }
-
+        // If the micro-syntax did not produce a binding to the left-hand side
+        // property, add it as an attribute in case a directive selector
+        // depends on it.
+        if (!propertiesToAdd.any((p) => p.name == directiveName)) {
+          attributesToAdd.add(new AttributeAst.from(origin, directiveName));
+        }
         newAst = new EmbeddedTemplateAst.from(
           origin,
           childNodes: [
             astNode,
           ],
-          attributes: [
-            new AttributeAst.from(origin, directiveName),
-          ],
+          attributes: attributesToAdd,
           properties: propertiesToAdd,
           letBindings: letBindingsToAdd,
         );
       } else {
-        propertiesToAdd.add(new PropertyAst.from(
-          origin,
-          directiveName,
-          starExpression,
-        ));
+        if (starExpression == null) {
+          // In the rare case the *-binding has no RHS expression, add the LHS
+          // as an attribute rather than a property. This allows matching a
+          // directive with an attribute selector, but no input of the same
+          // name.
+          attributesToAdd.add(new AttributeAst.from(origin, directiveName));
+        } else {
+          propertiesToAdd.add(new PropertyAst.from(
+            origin,
+            directiveName,
+            starExpression,
+          ));
+        }
         newAst = new EmbeddedTemplateAst.from(
           origin,
           childNodes: [
             astNode,
           ],
+          attributes: attributesToAdd,
           properties: propertiesToAdd,
         );
       }

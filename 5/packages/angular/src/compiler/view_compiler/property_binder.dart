@@ -77,7 +77,7 @@ void bind(
     nameResolver,
     context,
     parsedExpression,
-    viewDirective.template.preserveWhitespace,
+    viewDirective,
     fieldType,
   );
   if (isImmutable(parsedExpression, viewDirective.analyzedClass)) {
@@ -419,8 +419,8 @@ void bindDirectiveInputs(DirectiveAst directiveAst,
   dynamicInputsMethod.resetDebugInfo(
       compileElement.nodeIndex, compileElement.sourceAst);
   var lifecycleHooks = directive.lifecycleHooks;
-  bool calcChangesMap = lifecycleHooks.contains(LifecycleHooks.OnChanges);
-  bool calcChangedState = lifecycleHooks.contains(LifecycleHooks.AfterChanges);
+  bool calcChangesMap = lifecycleHooks.contains(LifecycleHooks.onChanges);
+  bool calcChangedState = lifecycleHooks.contains(LifecycleHooks.afterChanges);
   var isOnPushComp = directive.isComponent &&
       !isDefaultChangeDetectionStrategy(directive.changeDetection);
   var isStatefulComp = directive.isComponent &&
@@ -445,7 +445,7 @@ void bindDirectiveInputs(DirectiveAst directiveAst,
   // At the beginning of change detecting inputs we reset this flag to false,
   // and then set it to true if any of it's inputs change.
   if (((!isStatefulComp && isOnPushComp) || calcChangedState) &&
-      view.viewType != ViewType.HOST) {
+      view.viewType != ViewType.host) {
     detectChangesInInputsMethod
         .addStmt(DetectChangesVars.changed.set(o.literal(false)).toStmt());
   }
@@ -466,7 +466,7 @@ void bindDirectiveInputs(DirectiveAst directiveAst,
           view.nameResolver,
           DetectChangesVars.cachedCtx,
           input.value,
-          view.component.template.preserveWhitespace,
+          view.component,
           o.BOOL_TYPE);
       dynamicInputsMethod.addStmt(directiveInstance
           .prop(input.directiveName)
@@ -475,13 +475,9 @@ void bindDirectiveInputs(DirectiveAst directiveAst,
       continue;
     }
     if (isStatefulDirective) {
-      var fieldType = o.importType(directiveAst.directive.inputTypes[input]);
-      var checkExpression = convertCdExpressionToIr(
-          view.nameResolver,
-          DetectChangesVars.cachedCtx,
-          input.value,
-          view.component.template.preserveWhitespace,
-          fieldType);
+      var fieldType = o.importType(directive.inputTypes[input.directiveName]);
+      var checkExpression = convertCdExpressionToIr(view.nameResolver,
+          DetectChangesVars.cachedCtx, input.value, view.component, fieldType);
       if (isImmutable(input.value, view.component.analyzedClass)) {
         constantInputsMethod.addStmt(directiveInstance
             .prop(input.directiveName)
@@ -582,8 +578,8 @@ void bindToUpdateMethod(
     List<o.Statement> actions,
     CompileMethod method,
     {o.OutputType fieldType}) {
-  var checkExpression = convertCdExpressionToIr(view.nameResolver, context,
-      parsedExpression, view.component.template.preserveWhitespace, fieldType);
+  var checkExpression = convertCdExpressionToIr(
+      view.nameResolver, context, parsedExpression, view.component, fieldType);
   if (checkExpression == null) {
     // e.g. an empty expression was given
     return;
@@ -731,7 +727,7 @@ bool isPrimitiveTypeName(String typeName) {
     case 'bool':
     case 'int':
     case 'num':
-    case 'bool':
+    case 'double':
     case 'String':
       return true;
   }

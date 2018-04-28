@@ -6,9 +6,6 @@ import 'package:analyzer/dart/element/visitor.dart';
 import 'package:analyzer/src/dart/constant/value.dart';
 import 'package:analyzer/src/dart/element/element.dart';
 import 'package:analyzer/src/generated/utilities_dart.dart';
-import 'package:logging/logging.dart';
-import 'package:quiver/strings.dart' as strings;
-import 'package:source_gen/source_gen.dart';
 import 'package:angular/src/compiler/compile_metadata.dart';
 import 'package:angular/src/compiler/output/convert.dart';
 import 'package:angular/src/compiler/output/output_ast.dart' as o;
@@ -18,26 +15,25 @@ import 'package:angular/src/core/metadata.dart';
 import 'package:angular/src/source_gen/common/annotation_matcher.dart'
     as annotation_matcher;
 import 'package:angular/src/source_gen/common/url_resolver.dart';
+import 'package:angular_compiler/cli.dart';
 import 'package:angular_compiler/angular_compiler.dart';
+import 'package:source_gen/source_gen.dart';
 
 import 'dart_object_utils.dart' as dart_objects;
 
-// TODO: Remove the following lines (for --no-implicit-casts).
-// ignore_for_file: argument_type_not_assignable
-// ignore_for_file: invalid_assignment
+/// Returns whether the string is `null` _or_ an empty string.
+bool _isEmptyString(String s) => s == null || s.isEmpty;
 
 class CompileTypeMetadataVisitor
     extends SimpleElementVisitor<CompileTypeMetadata> {
-  final Logger _logger;
   final LibraryReader _library;
 
-  CompileTypeMetadataVisitor(this._logger, this._library);
+  CompileTypeMetadataVisitor(this._library);
 
   @override
   CompileTypeMetadata visitClassElement(ClassElement element) {
     if (element.isPrivate) {
-      _logger.severe('Provided classes must be public: $element');
-      return null;
+      throwFailure('Provided classes must be public: $element');
     }
     return _getCompileTypeMetadata(
       element,
@@ -59,31 +55,28 @@ class CompileTypeMetadataVisitor
     ConstructorElement constructor;
     final constructors = element.constructors;
     if (constructors.isEmpty) {
-      _logger.severe('No constructors found for class ${element.name}.');
-      return null;
+      BuildError.throwForElement(element, 'No constructors found');
     }
 
     constructor = constructors.firstWhere(
-        (constructor) => strings.isEmpty(constructor.name),
+        (constructor) => _isEmptyString(constructor.name),
         orElse: () => constructors.first);
 
     if (constructor.isPrivate) {
-      _logger.severe('Cannot use private constructor on class ${element.name}');
-      return null;
+      BuildError.throwForElement(element, 'No constructors found');
     }
+
     if (element.isAbstract && !constructor.isFactory) {
-      _logger.warning(
+      logWarning(
           'Found a constructor for abstract class ${element.name} but it is '
           'not a "factory", and cannot be invoked');
       return null;
     }
-    if (element.constructors.length > 1 &&
-        strings.isNotEmpty(constructor.name)) {
+    if (element.constructors.length > 1 && _isEmptyString(constructor.name)) {
       // No use in being a warning, as it's not something they need to fix
       // until we add a way to be able to "pick" the constructor to use.
-      _logger
-          .fine('Found ${element.constructors.length} constructors for class '
-              '${element.name}; using constructor ${constructor.name}.');
+      logFine('Found ${element.constructors.length} constructors for class '
+          '${element.name}; using constructor ${constructor.name}.');
     }
     return constructor;
   }
@@ -94,7 +87,7 @@ class CompileTypeMetadataVisitor
     if (provider.toTypeValue() != null) {
       var element = provider.toTypeValue().element;
       if (element is! ClassElement) {
-        _logger.warning('Expected to find class in provider list, but instead '
+        logWarning('Expected to find class in provider list, but instead '
             'found $provider');
         return null;
       }
@@ -114,7 +107,7 @@ class CompileTypeMetadataVisitor
       final genericType = typeArguments.first;
       if (!genericType.isDynamic) {
         providerTypeArgument = _getCompileTypeMetadata(
-          genericType.element,
+          genericType.element as ClassElement,
           genericTypes: genericType is ParameterizedType
               ? genericType.typeArguments
               : const [],
@@ -137,12 +130,14 @@ class CompileTypeMetadataVisitor
       // as Provider<T>:
       // (Again, see https://github.com/dart-lang/angular/issues/917)
       final opaqueTokenGeneric = token.type.typeArguments.first;
-      providerTypeArgument = _getCompileTypeMetadata(
-        opaqueTokenGeneric.element,
-        genericTypes: opaqueTokenGeneric is ParameterizedType
-            ? opaqueTokenGeneric.typeArguments
-            : const [],
-      );
+      if (!opaqueTokenGeneric.isDynamic) {
+        providerTypeArgument = _getCompileTypeMetadata(
+          opaqueTokenGeneric.element as ClassElement,
+          genericTypes: opaqueTokenGeneric is ParameterizedType
+              ? opaqueTokenGeneric.typeArguments
+              : const [],
+        );
+      }
     }
     return new CompileProviderMetadata(
       token: _token(token),
@@ -170,7 +165,7 @@ class CompileTypeMetadataVisitor
           enforceClassCanBeCreated: true,
         );
       } else {
-        _logger.severe(
+        throwFailure(
             'Provider.useClass can only be used with a class, but found '
             '${type.element}');
       }
@@ -178,7 +173,7 @@ class CompileTypeMetadataVisitor
       final typeValue = token.toTypeValue();
       if (typeValue != null && !typeValue.isDartCoreNull) {
         return _getCompileTypeMetadata(
-          typeValue.element,
+          typeValue.element as ClassElement,
           enforceClassCanBeCreated: true,
         );
       }
@@ -204,11 +199,11 @@ class CompileTypeMetadataVisitor
     if (!dart_objects.isNull(maybeUseFactory)) {
       if (maybeUseFactory.type.element is FunctionTypedElement) {
         return _factoryForFunction(
-          maybeUseFactory.type.element,
+          maybeUseFactory.type.element as FunctionTypedElement,
           dart_objects.coerceList(provider, 'deps', defaultTo: null),
         );
       } else {
-        _logger.severe('Provider.useFactory can only be used with a function, '
+        throwFailure('Provider.useFactory can only be used with a function, '
             'but found ${maybeUseFactory.type.element}');
       }
     }
@@ -260,14 +255,12 @@ class CompileTypeMetadataVisitor
     try {
       return _useValueExpression(useValue);
     } on _PrivateConstructorException catch (e) {
-      _logger
-          .severe('Could not link provider "${provider.getField('token')}" to '
-              '"${e.constructorName}". You may have valid Dart code but the '
-              'angular2 compiler has limited support for `useValue` that '
-              'eventually uses a private constructor. As a workaround we '
-              'recommend `useFactory`.');
+      throwFailure('Could not link provider "${provider.getField('token')}" to '
+          '"${e.constructorName}". You may have valid Dart code but the '
+          'angular2 compiler has limited support for `useValue` that '
+          'eventually uses a private constructor. As a workaround we '
+          'recommend `useFactory`.');
     }
-    return null;
   }
 
   List<CompileDiDependencyMetadata> _getCompileDiDependencyMetadata(
@@ -299,7 +292,7 @@ class CompileTypeMetadataVisitor
       // Handle cases where something is annotated with @Injectable() but does
       // not have something annotated properly. It's likely this is either
       // dead code or is not actually used via DI. We can ignore for now.
-      _logger.warning(''
+      logWarning(''
           'Could not resolve token for $p on ${p.enclosingElement} in '
           '${p.library.identifier}');
       return new CompileDiDependencyMetadata();
@@ -358,10 +351,10 @@ class CompileTypeMetadataVisitor
     if (token == null) {
       // provide(someOpaqueToken, ...) where someOpaqueToken did not resolve.
       if (annotation == null) {
-        _logger.warning('Could not resolve an OpaqueToken on a Provider!');
+        logWarning('Could not resolve an OpaqueToken on a Provider!');
         return new CompileTokenMetadata(value: 'OpaqueToken__NOT_RESOLVED');
       } else {
-        _logger.warning(''
+        logWarning(''
             'Could not resolve a token from $annotation: '
             'Will fall back to using a reference to the identifier.');
         return _annotationToToken(annotation as ElementAnnotationImpl);
@@ -385,7 +378,7 @@ class CompileTypeMetadataVisitor
       if (invocation != null) {
         if (invocation.positionalArguments.isNotEmpty ||
             invocation.namedArguments.isNotEmpty) {
-          _logger.warning('Cannot use const objects with arguments as a '
+          logWarning('Cannot use const objects with arguments as a '
               'provider token: $annotation');
           return new CompileTokenMetadata(value: 'OpaqueToken__NOT_RESOLVED');
         }
@@ -393,7 +386,8 @@ class CompileTypeMetadataVisitor
       return _tokenForType(token.type, isInstance: invocation != null);
     } else if (token.type.element is FunctionTypedElement) {
       return new CompileTokenMetadata(
-          identifier: _identifierForFunction(token.type.element));
+          identifier: _identifierForFunction(
+              token.type.element as FunctionTypedElement));
     }
     throw new ArgumentError('@Inject is not yet supported for $token.');
   }
@@ -423,7 +417,7 @@ class CompileTypeMetadataVisitor
         identifier: _idFor(type), identifierIsInstance: isInstance);
   }
 
-  CompileIdentifierMetadata _idFor(ParameterizedType type) =>
+  CompileIdentifierMetadata _idFor(DartType type) =>
       new CompileIdentifierMetadata(
           name: getTypeName(type), moduleUrl: moduleUrl(type.element));
 
@@ -454,7 +448,8 @@ class CompileTypeMetadataVisitor
     } else if (token.type is InterfaceType) {
       return _expressionForType(token);
     } else if (token.type.element is FunctionTypedElement) {
-      return o.importExpr(_identifierForFunction(token.type.element));
+      return o.importExpr(
+          _identifierForFunction(token.type.element as FunctionTypedElement));
     } else {
       throw new ArgumentError(
           'Could not create useValue expression for $token');
@@ -569,7 +564,7 @@ class CompileTypeMetadataVisitor
     }
 
     // TODO: Make this more severe/an error.
-    _logger.warning('Could not resolve dependency $object');
+    logWarning('Could not resolve dependency $object');
     return new CompileDiDependencyMetadata();
   }
 

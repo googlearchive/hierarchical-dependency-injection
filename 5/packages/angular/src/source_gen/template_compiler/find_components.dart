@@ -4,6 +4,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/dart/element/visitor.dart';
 import 'package:analyzer/src/dart/element/element.dart';
+import 'package:angular/src/compiler/output/output_ast.dart' as o;
 import 'package:angular_compiler/cli.dart';
 import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
@@ -17,16 +18,13 @@ import 'package:angular/src/core/metadata/lifecycle_hooks.dart';
 import 'package:angular/src/source_gen/common/annotation_matcher.dart';
 import 'package:angular/src/source_gen/common/url_resolver.dart';
 import 'package:angular_compiler/angular_compiler.dart';
+import 'package:source_span/source_span.dart';
 
 import '../../compiler/view_compiler/property_binder.dart'
     show isPrimitiveTypeName;
 import 'compile_metadata.dart';
 import 'dart_object_utils.dart';
 import 'pipe_visitor.dart';
-
-// TODO: Remove the following lines (for --no-implicit-casts).
-// ignore_for_file: argument_type_not_assignable
-// ignore_for_file: invalid_assignment
 
 const String _directivesProperty = 'directives';
 const String _visibilityProperty = 'visibility';
@@ -78,15 +76,15 @@ class NormalizedComponentVisitor extends RecursiveElementVisitor<Null> {
   List<CompilePipeMetadata> _visitPipes(ClassElement element) => _visitTypes(
         element,
         'pipes',
-        safeMatcher(isPipe, log),
-        () => new PipeVisitor(log, _library),
+        safeMatcher(isPipe),
+        () => new PipeVisitor(_library),
       );
 
   List<CompileDirectiveMetadata> _visitDirectives(ClassElement element) =>
       _visitTypes(
         element,
         _directivesProperty,
-        safeMatcher(isDirective, log),
+        safeMatcher(isDirective),
         () => new ComponentVisitor(_library),
       );
 
@@ -97,46 +95,52 @@ class NormalizedComponentVisitor extends RecursiveElementVisitor<Null> {
     ElementVisitor<T> visitor(),
   ) {
     return element.metadata
-        .where(safeMatcher(
-          hasDirectives,
-          log,
-        ))
-        .expand((annotation) => _visitTypeObjects(
+        .where(safeMatcher(hasDirectives))
+        .expand((annotation) => _visitTypesForComponent(
               coerceList(annotation.computeConstantValue(), field),
-              safeMatcher(annotationMatcher, log),
+              safeMatcher(annotationMatcher),
               visitor,
               // Only pass the annotation for directives: [ ... ], not other
               // elements. They also can cause problems if not resolved but it
               // is missing directives that blow up in a non-actionable way.
-              annotation: field == _directivesProperty ? annotation : null,
+              annotation: field == _directivesProperty
+                  ? annotation as ElementAnnotationImpl
+                  : null,
               element: element,
             ))
         .toList();
   }
 
-  void _failFastOnUnresolvedTypes(
-    NodeList<Expression> expressions,
+  void _failFastOnUnresolvedDirectives(
+    Iterable<Expression> expressions,
     ClassElement componentType,
   ) {
-    // TODO: Throw an exception type that is specifically handled by the builder
-    // and doesn't print a stack trace.
-    throw new StateError(''
-        'Failed to parse @Component annotation for ${componentType.name}:\n'
-        'One or more of the following arguments were unresolvable: \n'
-        '* ${expressions.join('\n* ')}'
-        '\n'
-        'The root cause could be a mispelling, or an import statement that \n'
-        'looks valid but is not resolvable at build time. Bazel users should \n'
-        'check their BUILD file to ensure all dependencies are listed.\n\n');
+    final sourceUrl = componentType.source.uri;
+    throw new BuildError(
+      messages.unresolvedSource(
+        expressions.map((e) {
+          return new SourceSpan(
+            new SourceLocation(e.offset, sourceUrl: sourceUrl),
+            new SourceLocation(e.offset + e.length, sourceUrl: sourceUrl),
+            e.toSource(),
+          );
+        }),
+        message: 'This argument *may* have not been resolved',
+        reason: ''
+            'Compiling @Component-annotated class "${componentType.name}" '
+            'failed.\n\n${messages.analysisFailureReasons}',
+      ),
+    );
   }
 
-  List<T> _visitTypeObjects<T>(
+  List<T> _visitTypesForComponent<T>(
     Iterable<DartObject> directives,
     AnnotationMatcher annotationMatcher,
     ElementVisitor<T> visitor(), {
     ElementAnnotationImpl annotation,
     ClassElement element,
   }) {
+    // TODO(matanl): Extract this code somewhere common, likely useful.
     if (directives.isEmpty && annotation != null) {
       // Two reasons we got to this point:
       // 1. The directives: const [ ... ] list was empty or omitted.
@@ -156,7 +160,9 @@ class NormalizedComponentVisitor extends RecursiveElementVisitor<Null> {
               // check anyway at this point.
               values.elements.every((e) => e.staticType?.isDynamic != false)) {
             // We didn't resolve something.
-            _failFastOnUnresolvedTypes(values.elements, element);
+            _failFastOnUnresolvedDirectives(
+                values.elements.where((e) => e.staticType?.isDynamic != false),
+                element);
           }
         }
       }
@@ -197,7 +203,7 @@ class ComponentVisitor
   @override
   CompileDirectiveMetadata visitClassElement(ClassElement element) {
     final annotation = element.metadata.firstWhere(
-      safeMatcher(isDirective, log),
+      safeMatcher(isDirective),
       orElse: () => null,
     );
     if (annotation == null) return null;
@@ -211,7 +217,7 @@ class ComponentVisitor
   @override
   CompileDirectiveMetadata visitFunctionElement(FunctionElement element) {
     final annotation = element.metadata.firstWhere(
-      safeMatcherType(Directive, log),
+      safeMatcherType(Directive),
       orElse: () => null,
     );
     if (annotation == null) return null;
@@ -241,7 +247,7 @@ class ComponentVisitor
       invalid = true;
     }
     if (invalid) return null;
-    final type = element.accept(new CompileTypeMetadataVisitor(log, _library));
+    final type = element.accept(new CompileTypeMetadataVisitor(_library));
     final selector = coerceString(annotationValue, 'selector');
     return new CompileDirectiveMetadata(
       type: type,
@@ -285,7 +291,7 @@ class ComponentVisitor
   CompileDirectiveMetadata visitMethodElement(MethodElement element) {
     super.visitMethodElement(element);
     for (ElementAnnotation annotation in element.metadata) {
-      if (safeMatcherType(HostListener, log)(annotation)) {
+      if (safeMatcherType(HostListener)(annotation)) {
         _addHostListener(annotation, element);
       }
     }
@@ -298,7 +304,7 @@ class ComponentVisitor
     bool isSetter: false,
   }) {
     for (ElementAnnotation annotation in element.metadata) {
-      if (safeMatcherType(Input, log)(annotation)) {
+      if (safeMatcherType(Input)(annotation)) {
         if (isSetter && element.isPublic) {
           final isField = element is FieldElement;
           // Resolves specified generic type parameters.
@@ -319,9 +325,10 @@ class ComponentVisitor
             } else {
               // Convert any generic type parameters from the input's type to
               // our internal output AST.
-              final typeArguments = resolvedType is ParameterizedType
-                  ? resolvedType.typeArguments.map(fromDartType).toList()
-                  : const [];
+              final List<o.OutputType> typeArguments =
+                  resolvedType is ParameterizedType
+                      ? resolvedType.typeArguments.map(fromDartType).toList()
+                      : const [];
               _inputTypes[element.displayName] = new CompileTypeMetadata(
                   moduleUrl: moduleUrl(element),
                   name: typeName,
@@ -332,14 +339,14 @@ class ComponentVisitor
           log.severe('@Input can only be used on a public setter or non-final '
               'field, but was found on $element.');
         }
-      } else if (safeMatcherType(Output, log)(annotation)) {
+      } else if (safeMatcherType(Output)(annotation)) {
         if (isGetter && element.isPublic) {
           _addPropertyBindingTo(_outputs, annotation, element);
         } else {
           log.severe('@Output can only be used on a public getter or field, '
               'but was found on $element.');
         }
-      } else if (safeMatcherType(HostBinding, log)(annotation)) {
+      } else if (safeMatcherType(HostBinding)(annotation)) {
         if (isGetter && element.isPublic) {
           _addHostBinding(annotation, element);
         } else {
@@ -349,7 +356,7 @@ class ComponentVisitor
       } else if (safeMatcherTypes(const [
         ContentChildren,
         ContentChild,
-      ], log)(annotation)) {
+      ])(annotation)) {
         if (isSetter && element.isPublic) {
           _queries.add(_getQuery(
             annotation,
@@ -364,7 +371,7 @@ class ComponentVisitor
       } else if (safeMatcherTypes(const [
         ViewChildren,
         ViewChild,
-      ], log)(annotation)) {
+      ])(annotation)) {
         if (isSetter && element.isPublic) {
           _viewQueries.add(_getQuery(
             annotation,
@@ -441,8 +448,6 @@ class ComponentVisitor
               propertyType is ParameterizedType &&
               _htmlElement
                   .isAssignableFromType(propertyType.typeArguments.first),
-      isQueryListType: propertyType?.element != null &&
-          $QueryList.isExactlyType(propertyType),
       read: readType != null
           ? new CompileTokenMetadata(
               identifier: new CompileIdentifierMetadata(
@@ -475,11 +480,15 @@ class ComponentVisitor
     _hostProperties[property] = bindTo;
   }
 
-  void _addHostListener(ElementAnnotation annotation, Element element) {
+  void _addHostListener(ElementAnnotation annotation, MethodElement element) {
     var value = annotation.computeConstantValue();
     var eventName = coerceString(value, 'eventName');
     var methodName = element.name;
     var methodArgs = coerceStringList(value, 'args');
+    if (methodArgs.isEmpty && element.parameters.length == 1) {
+      // Infer $event.
+      methodArgs = const [r'$event'];
+    }
     _hostListeners[eventName] = '$methodName(${methodArgs.join(', ')})';
   }
 
@@ -503,8 +512,8 @@ class ComponentVisitor
     final propertyName = element.displayName;
     final bindingName =
         coerceString(value, 'bindingPropertyName', defaultTo: propertyName);
-    _prohibitBindingChange(element.enclosingElement, propertyName, bindingName,
-        immutableBindings ?? bindings);
+    _prohibitBindingChange(element.enclosingElement as ClassElement,
+        propertyName, bindingName, immutableBindings ?? bindings);
     bindings[propertyName] = bindingName;
   }
 
@@ -517,7 +526,7 @@ class ComponentVisitor
       _implementsNoSuchMethod = true;
     }
     final annotation = element.metadata
-        .firstWhere(safeMatcher(isDirective, log), orElse: () => null);
+        .firstWhere(safeMatcher(isDirective), orElse: () => null);
     if (annotation != null) {
       // Collect metadata from class annotation.
       final annotationValue = annotation.computeConstantValue();
@@ -550,12 +559,12 @@ class ComponentVisitor
   ) {
     _directiveClassElement = element;
     _collectInheritableMetadata(element);
-    final isComp = safeMatcher(isComponent, log)(annotation);
+    final isComp = safeMatcher(isComponent)(annotation);
     final annotationValue = annotation.computeConstantValue();
     // Some directives won't have templates but the template parser is going to
     // assume they have at least defaults.
     CompileTypeMetadata componentType =
-        element.accept(new CompileTypeMetadataVisitor(log, _library));
+        element.accept(new CompileTypeMetadataVisitor(_library));
     final template = isComp
         ? _createTemplateMetadata(annotationValue, componentType)
         : new CompileTemplateMetadata();
@@ -581,7 +590,7 @@ class ComponentVisitor
       lifecycleHooks: extractLifecycleHooks(element),
       providers: _extractProviders(annotationValue, 'providers'),
       viewProviders: _extractProviders(annotationValue, 'viewProviders'),
-      exports: _extractExports(annotation, element),
+      exports: _extractExports(annotation as ElementAnnotationImpl, element),
       queries: _queries,
       viewQueries: _viewQueries,
       template: template,
@@ -641,8 +650,10 @@ class ComponentVisitor
 
   List<CompileProviderMetadata> _extractProviders(
           DartObject component, String providerField) =>
-      visitAll(coerceList(component, providerField),
-          new CompileTypeMetadataVisitor(log, _library).createProviderMetadata);
+      visitAll(
+          const ModuleReader()
+              .extractProviderObjects(getField(component, providerField)),
+          new CompileTypeMetadataVisitor(_library).createProviderMetadata);
 
   List<CompileIdentifierMetadata> _extractExports(
       ElementAnnotationImpl annotation, ClassElement element) {
@@ -686,7 +697,7 @@ class ComponentVisitor
       }
 
       if (id.staticElement is ClassElement) {
-        analyzedClass = new AnalyzedClass(id.staticElement);
+        analyzedClass = new AnalyzedClass(id.staticElement as ClassElement);
       }
 
       // TODO(het): Also store the `DartType` since we know it statically.
@@ -703,18 +714,18 @@ class ComponentVisitor
 
 List<LifecycleHooks> extractLifecycleHooks(ClassElement clazz) {
   const hooks = const <TypeChecker, LifecycleHooks>{
-    const TypeChecker.fromRuntime(OnInit): LifecycleHooks.OnInit,
-    const TypeChecker.fromRuntime(OnDestroy): LifecycleHooks.OnDestroy,
-    const TypeChecker.fromRuntime(DoCheck): LifecycleHooks.DoCheck,
-    const TypeChecker.fromRuntime(OnChanges): LifecycleHooks.OnChanges,
-    const TypeChecker.fromRuntime(AfterChanges): LifecycleHooks.AfterChanges,
+    const TypeChecker.fromRuntime(OnInit): LifecycleHooks.onInit,
+    const TypeChecker.fromRuntime(OnDestroy): LifecycleHooks.onDestroy,
+    const TypeChecker.fromRuntime(DoCheck): LifecycleHooks.doCheck,
+    const TypeChecker.fromRuntime(OnChanges): LifecycleHooks.onChanges,
+    const TypeChecker.fromRuntime(AfterChanges): LifecycleHooks.afterChanges,
     const TypeChecker.fromRuntime(AfterContentInit):
-        LifecycleHooks.AfterContentInit,
+        LifecycleHooks.afterContentInit,
     const TypeChecker.fromRuntime(AfterContentChecked):
-        LifecycleHooks.AfterContentChecked,
-    const TypeChecker.fromRuntime(AfterViewInit): LifecycleHooks.AfterViewInit,
+        LifecycleHooks.afterContentChecked,
+    const TypeChecker.fromRuntime(AfterViewInit): LifecycleHooks.afterViewInit,
     const TypeChecker.fromRuntime(AfterViewChecked):
-        LifecycleHooks.AfterViewChecked,
+        LifecycleHooks.afterViewChecked,
   };
   return hooks.keys
       .where((hook) => hook.isAssignableFrom(clazz))

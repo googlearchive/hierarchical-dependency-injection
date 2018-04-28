@@ -1,6 +1,5 @@
 import 'package:angular/src/core/di.dart' show Injectable, Inject, OpaqueToken;
 import 'package:angular/src/core/zone/ng_zone.dart' show NgZone;
-import 'package:angular/src/facade/exceptions.dart' show BaseException;
 
 const OpaqueToken EVENT_MANAGER_PLUGINS =
     const OpaqueToken('EventManagerPlugins');
@@ -12,10 +11,10 @@ class EventManager {
   Map<String, EventManagerPlugin> _eventToPlugin;
   EventManager(@Inject(EVENT_MANAGER_PLUGINS) List<EventManagerPlugin> plugins,
       this._zone) {
-    for (var p in plugins) {
-      p.manager = this;
+    for (int i = 0, len = plugins.length; i < len; i++) {
+      plugins[i].manager = this;
     }
-    this._plugins = plugins.reversed.toList();
+    this._plugins = plugins;
     _eventToPlugin = <String, EventManagerPlugin>{};
   }
   Function addEventListener(
@@ -33,15 +32,14 @@ class EventManager {
     EventManagerPlugin plugin = _eventToPlugin[eventName];
     if (plugin != null) return plugin;
     var plugins = this._plugins;
-    for (var i = 0; i < plugins.length; i++) {
+    for (var i = plugins.length - 1; i >= 0; i--) {
       plugin = plugins[i];
       if (plugin.supports(eventName)) {
         _eventToPlugin[eventName] = plugin;
         return plugin;
       }
     }
-    throw new BaseException(
-        'No event manager plugin found for event $eventName');
+    throw new StateError('No event manager plugin found for event $eventName');
   }
 }
 

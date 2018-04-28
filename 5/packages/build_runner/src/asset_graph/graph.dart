@@ -23,13 +23,6 @@ part 'serialization.dart';
 
 /// All the [AssetId]s involved in a build, and all of their outputs.
 class AssetGraph {
-  /// A map of phase number to primary inputs that failed during that phase.
-  ///
-  /// See [markActionFailed] and [markActionSucceeded] for more info.
-  final Map<int, Set<AssetId>> _failedActions;
-  UnmodifiableMapView<int, Iterable<AssetId>> get failedActions =>
-      new UnmodifiableMapView(_failedActions);
-
   /// All the [AssetNode]s in the graph, indexed by package and then path.
   final _nodesByPackage = <String, Map<String, AssetNode>>{};
 
@@ -42,9 +35,7 @@ class AssetGraph {
   /// The [Platform.version] this graph was created with.
   final String dartVersion;
 
-  AssetGraph._(this.buildPhasesDigest, this.dartVersion,
-      {Map<int, Set<AssetId>> failedActions})
-      : _failedActions = failedActions ?? new Map<int, Set<AssetId>>();
+  AssetGraph._(this.buildPhasesDigest, this.dartVersion);
 
   /// Deserializes this graph.
   factory AssetGraph.deserialize(List<int> serializedGraph) =>
@@ -83,24 +74,6 @@ class AssetGraph {
     var pkg = _nodesByPackage[id?.package];
     if (pkg == null) return null;
     return pkg[id.path];
-  }
-
-  /// Marks an action in [phaseNumber] with [primaryInputId] as having failed.
-  void markActionFailed(int phaseNumber, AssetId primaryInputId) {
-    _failedActions
-        .putIfAbsent(phaseNumber, () => new Set<AssetId>())
-        .add(primaryInputId);
-  }
-
-  /// Marks an action in [phaseNumber] with [primaryInputId] as having
-  /// succeeded.
-  void markActionSucceeded(int phaseNumber, AssetId primaryInputId) {
-    var phaseSet = _failedActions[phaseNumber];
-    if (phaseSet == null) return;
-    phaseSet.remove(primaryInputId);
-    if (phaseSet.isEmpty) {
-      _failedActions.remove(phaseNumber);
-    }
   }
 
   /// Adds [node] to the graph if it doesn't exist.
@@ -161,7 +134,7 @@ class AssetGraph {
             builderOptionsIdForAction(phase, phaseNum),
             computeBuilderOptionsDigest(phase.builderOptions)));
       } else if (phase is PostBuildPhase) {
-        int actionNum = 0;
+        var actionNum = 0;
         for (var builderAction in phase.builderActions) {
           add(new BuilderOptionsAssetNode(
               builderOptionsIdForAction(builderAction, actionNum),
@@ -217,7 +190,6 @@ class AssetGraph {
       }
       var builderOptionsNode = get(node.builderOptionsId);
       builderOptionsNode.outputs.remove(id);
-      markActionSucceeded(node.phaseNumber, node.primaryInput);
     }
     _nodesByPackage[id.package].remove(id.path);
     return removedIds;
@@ -234,6 +206,11 @@ class AssetGraph {
   /// All the generated outputs in the graph.
   Iterable<AssetId> get outputs =>
       allNodes.where((n) => n.isGenerated).map((n) => n.id);
+
+  /// The outputs which were, or would have been, produced by failing actions.
+  Iterable<GeneratedAssetNode> get failedOutputs => allNodes
+      .where((n) => n is GeneratedAssetNode && n.isFailure)
+      .map((n) => n as GeneratedAssetNode);
 
   /// All the generated outputs for a particular phase.
   Iterable<GeneratedAssetNode> outputsForPhase(String package, int phase) =>
@@ -260,7 +237,7 @@ class AssetGraph {
     // Transitively invalidates all assets.
     void invalidateNodeAndDeps(AssetId id, ChangeType rootChangeType,
         {bool forceUpdate: false}) {
-      var node = this.get(id);
+      var node = get(id);
       if (node == null) return;
       if (!invalidatedIds.add(id)) return;
 
@@ -294,7 +271,7 @@ class AssetGraph {
       }
     });
 
-    var newAndModifiedNodes = modifyIds.map(this.get).toList()
+    var newAndModifiedNodes = modifyIds.map(get).toList()
       ..addAll(_addSources(newIds));
     // Pre-emptively compute digests for the new and modified nodes we know have
     // outputs.
@@ -450,7 +427,7 @@ class AssetGraph {
   /// Does not return anything because [PostProcessAnchorNode]s are synthetic
   /// and should not be treated as inputs.
   void _addPostBuildPhaseAnchors(PostBuildPhase phase, Set<AssetId> allInputs) {
-    int actionNum = 0;
+    var actionNum = 0;
     for (var action in phase.builderActions) {
       var inputs = allInputs.where((input) => _actionMatches(action, input));
       for (var input in inputs) {
@@ -492,6 +469,7 @@ class AssetGraph {
           primaryInput: primaryInput,
           state: GeneratedNodeState.definitelyNeedsUpdate,
           wasOutput: false,
+          isFailure: false,
           builderOptionsId: builderOptionsNode.id,
           isHidden: isHidden);
       builderOptionsNode.outputs.add(output);

@@ -32,10 +32,10 @@ class KernelSummaryBuilder implements Builder {
   @override
   Future build(BuildStep buildStep) async {
     var module = new Module.fromJson(
-        JSON.decode(await buildStep.readAsString(buildStep.inputId))
+        json.decode(await buildStep.readAsString(buildStep.inputId))
             as Map<String, dynamic>);
     try {
-      await createKernelSummary(module, buildStep);
+      await _createKernelSummary(module, buildStep);
     } on KernelSummaryException catch (e, s) {
       log.warning('Error creating ${module.unlinkedSummaryId}:\n$e\n$s');
     }
@@ -43,7 +43,7 @@ class KernelSummaryBuilder implements Builder {
 }
 
 /// Creates a kernel summary file for [module].
-Future createKernelSummary(Module module, BuildStep buildStep,
+Future _createKernelSummary(Module module, BuildStep buildStep,
     {bool isRoot = false}) async {
   var transitiveDeps = await module.computeTransitiveDependencies(buildStep);
   var transitiveSummaryDeps = <AssetId>[];

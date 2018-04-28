@@ -3,11 +3,9 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:build/build.dart';
-import 'package:glob/glob.dart';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
 
@@ -22,11 +20,31 @@ final _logger = new Logger('CreateOutputDir');
 const _manifestName = '.build.manifest';
 const _manifestSeparator = '\n';
 
-/// Creates a merged output directory for a build at [outputPath].
+/// Creates merged output directories for each value in [outputMap].
 ///
 /// Returns whether it succeeded or not.
-Future<bool> createMergedOutputDir(
+Future<bool> createMergedOutputDirectories(
+    Map<String, String> outputMap,
+    AssetGraph assetGraph,
+    PackageGraph packageGraph,
+    AssetReader reader,
+    BuildEnvironment environment,
+    List<BuildPhase> buildPhases) async {
+  for (var output in outputMap.keys) {
+    if (!await _createMergedOutputDir(output, outputMap[output], assetGraph,
+        packageGraph, reader, environment, buildPhases)) {
+      _logger.severe('Unable to create merged directory for $output.\n'
+          'Choose a different directory or delete the contents of that '
+          'directory.');
+      return false;
+    }
+  }
+  return true;
+}
+
+Future<bool> _createMergedOutputDir(
     String outputPath,
+    String root,
     AssetGraph assetGraph,
     PackageGraph packageGraph,
     AssetReader reader,
@@ -61,15 +79,15 @@ Future<bool> createMergedOutputDir(
 
     for (var inputId in inputsAndSameActionOutputs) {
       final inputNode = assetGraph.get(inputId);
-      if (_shouldSkipNode(inputNode, buildPhases, skipOptional: false)) {
+      if (_shouldSkipNode(inputNode, buildPhases, root, skipOptional: false)) {
         continue;
       }
       if (inputNode is GeneratedAssetNode &&
           buildPhases[inputNode.phaseNumber].isOptional &&
           !originalOutputAssets.contains(inputId)) {
         originalOutputAssets.add(inputId);
-        outputAssets
-            .add(await _writeAsset(inputId, outputDir, packageGraph, reader));
+        outputAssets.add(
+            await _writeAsset(inputId, outputDir, root, packageGraph, reader));
         await _ensureInputs(inputNode);
       }
     }
@@ -80,47 +98,39 @@ Future<bool> createMergedOutputDir(
     if (!outputDirExists) {
       await outputDir.create(recursive: true);
     }
-    var rootDirs = new Set<String>();
-
-    for (var node in assetGraph.packageNodes(packageGraph.root.name)) {
-      if (_shouldSkipNode(node, buildPhases, skipOptional: false)) continue;
-      var parts = p.url.split(node.id.path);
-      if (parts.length == 1) continue;
-      var dir = parts.first;
-      if (dir == outputPath || dir == 'lib') continue;
-      rootDirs.add(parts.first);
-    }
 
     for (var node in assetGraph.allNodes) {
-      if (_shouldSkipNode(node, buildPhases)) continue;
+      if (_shouldSkipNode(node, buildPhases, root)) continue;
       originalOutputAssets.add(node.id);
-      outputAssets
-          .add(await _writeAsset(node.id, outputDir, packageGraph, reader));
+      node.lastKnownDigest ??= await reader.digest(node.id);
+      outputAssets.add(
+          await _writeAsset(node.id, outputDir, root, packageGraph, reader));
       if (node is GeneratedAssetNode) {
         await _ensureInputs(node);
       }
     }
 
-    outputAssets.addAll(
-        await _createMissingTestHtmlFiles(outputPath, packageGraph.root.name));
-
     var packagesFileContent = packageGraph.allPackages.keys
         .map((p) => '$p:packages/$p/')
         .join('\r\n');
-    for (var dir in rootDirs) {
-      var packagesAsset =
-          new AssetId(packageGraph.root.name, p.url.join(dir, '.packages'));
-      _writeAsString(outputDir, packagesAsset, packagesFileContent);
-      outputAssets.add(packagesAsset);
-      var link = new Link(p.join(outputDir.path, dir, 'packages'));
-      if (!link.existsSync()) {
-        link.createSync(p.join('..', 'packages'), recursive: true);
+    var packagesAsset = new AssetId(packageGraph.root.name, '.packages');
+    _writeAsString(outputDir, packagesAsset, packagesFileContent);
+    outputAssets.add(packagesAsset);
+
+    if (root == null) {
+      for (var dir
+          in _findRootDirs(outputPath, assetGraph, packageGraph, buildPhases)) {
+        var link = new Link(p.join(outputDir.path, dir, 'packages'));
+        if (!link.existsSync()) {
+          link.createSync(p.join('..', 'packages'), recursive: true);
+        }
       }
     }
   });
 
   logTimedSync(_logger, 'Writing asset manifest', () {
-    var content = outputAssets.map((id) => id.path).join(_manifestSeparator);
+    var paths = outputAssets.map((id) => id.path).toList()..sort();
+    var content = paths.join(_manifestSeparator);
     _writeAsString(
         outputDir, new AssetId(packageGraph.root.name, _manifestName), content);
   });
@@ -128,12 +138,36 @@ Future<bool> createMergedOutputDir(
   return true;
 }
 
-bool _shouldSkipNode(AssetNode node, List<BuildPhase> buildPhases,
+Set<String> _findRootDirs(String outputPath, AssetGraph assetGraph,
+    PackageGraph packageGraph, List<BuildPhase> buildPhases) {
+  var rootDirs = new Set<String>();
+  for (var node in assetGraph.packageNodes(packageGraph.root.name)) {
+    if (_shouldSkipNode(node, buildPhases, null, skipOptional: false)) {
+      continue;
+    }
+    var parts = p.url.split(node.id.path);
+    if (parts.length == 1) continue;
+    var dir = parts.first;
+    if (dir == outputPath || dir == 'lib') continue;
+    rootDirs.add(parts.first);
+  }
+  return rootDirs;
+}
+
+bool _shouldSkipNode(AssetNode node, List<BuildPhase> buildPhases, String root,
     {bool skipOptional: true}) {
   if (!node.isReadable) return true;
+  if (node.isDeleted) return true;
+  if (root != null &&
+      !(node.id.path.startsWith('lib/')) &&
+      !p.isWithin(root, node.id.path)) {
+    return true;
+  }
   if (node is InternalAssetNode) return true;
   if (node is GeneratedAssetNode) {
-    if (!node.wasOutput || node.state != GeneratedNodeState.upToDate) {
+    if (!node.wasOutput ||
+        node.isFailure ||
+        node.state != GeneratedNodeState.upToDate) {
       return true;
     }
     if (skipOptional && buildPhases[node.phaseNumber].isOptional) return true;
@@ -142,14 +176,18 @@ bool _shouldSkipNode(AssetNode node, List<BuildPhase> buildPhases,
   return false;
 }
 
-Future<AssetId> _writeAsset(AssetId id, Directory outputDir,
+Future<AssetId> _writeAsset(AssetId id, Directory outputDir, String root,
     PackageGraph packageGraph, AssetReader reader) async {
   String assetPath;
-  if (id.path.startsWith('lib')) {
+  if (id.path.startsWith('lib/')) {
     assetPath =
         p.url.join('packages', id.package, id.path.substring('lib/'.length));
   } else {
     assetPath = id.path;
+    assert(id.package == packageGraph.root.name);
+    if (root != null && p.isWithin(root, id.path)) {
+      assetPath = p.relative(id.path, from: root);
+    }
   }
 
   var outputId = new AssetId(packageGraph.root.name, assetPath);
@@ -191,44 +229,6 @@ File _fileFor(Directory outputDir, AssetId id) {
   var file = new File(p.join(outputDir.path, relativePath));
   file.createSync(recursive: true);
   return file;
-}
-
-/// Creates html files for tests in [outputDir] that are missing them.
-///
-/// This only exists as a hack until we have something like
-/// https://github.com/dart-lang/build/issues/508.
-Future<List<AssetId>> _createMissingTestHtmlFiles(
-    String outputDir, String rootPackage) async {
-  if (!await new Directory(p.join(outputDir, 'test')).exists()) return [];
-
-  var dartBrowserTestSuffix = '_test.dart.browser_test.dart';
-  var htmlTestSuffix = '_test.html';
-  var dartFiles =
-      new Glob('test/**$dartBrowserTestSuffix').list(root: outputDir);
-  var outputAssets = <AssetId>[];
-  await for (var file in dartFiles) {
-    var dartPath = p.relative(file.path, from: outputDir);
-    var htmlPath =
-        dartPath.substring(0, dartPath.length - dartBrowserTestSuffix.length) +
-            htmlTestSuffix;
-    var htmlFile = new File(p.join(outputDir, htmlPath));
-    if (!await htmlFile.exists()) {
-      var originalDartPath = p.basename(
-          dartPath.substring(0, dartPath.length - '.browser_test.dart'.length));
-      await htmlFile.writeAsString('''
-<!DOCTYPE html>
-<html>
-<head>
-  <title>${htmlEscape.convert(htmlPath)} Test</title>
-  <link rel="x-dart-test"
-        href="${htmlEscape.convert(originalDartPath)}">
-  <script src="packages/test/dart.js"></script>
-</head>
-</html>''');
-      outputAssets.add(new AssetId(rootPackage, htmlPath));
-    }
-  }
-  return outputAssets;
 }
 
 /// Checks for a manifest file in [outputDir] and deletes all referenced files.

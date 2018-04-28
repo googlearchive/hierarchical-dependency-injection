@@ -1,7 +1,9 @@
 // Copyright (c) 2016, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
+
 import 'dart:async';
+import 'dart:collection';
 import 'dart:io';
 
 import 'package:build/build.dart';
@@ -9,7 +11,6 @@ import 'package:build_config/build_config.dart';
 import 'package:build_resolvers/build_resolvers.dart';
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
-import 'package:glob/glob.dart';
 import 'package:logging/logging.dart';
 import 'package:watcher/watcher.dart';
 
@@ -18,8 +19,6 @@ import '../asset/reader.dart';
 import '../asset/writer.dart';
 import '../asset_graph/graph.dart';
 import '../asset_graph/node.dart';
-import '../builder/post_process_builder.dart';
-import '../builder/run_post_process_builder.dart';
 import '../environment/build_environment.dart';
 import '../environment/io_environment.dart';
 import '../environment/overridable_environment.dart';
@@ -59,10 +58,11 @@ Future<BuildResult> build(
   bool skipBuildScriptCheck,
   bool enableLowResourcesMode,
   Map<String, BuildConfig> overrideBuildConfig,
-  String outputDir,
+  Map<String, String> outputMap,
   bool trackPerformance,
   bool verbose,
   Map<String, Map<String, dynamic>> builderConfigOverrides,
+  bool isReleaseBuild,
 }) async {
   builderConfigOverrides ??= const {};
   packageGraph ??= new PackageGraph.forThisPackage();
@@ -84,22 +84,28 @@ Future<BuildResult> build(
       logLevel: logLevel,
       skipBuildScriptCheck: skipBuildScriptCheck,
       enableLowResourcesMode: enableLowResourcesMode,
-      outputDir: outputDir,
+      outputMap: outputMap,
       trackPerformance: trackPerformance,
       verbose: verbose);
   var terminator = new Terminator(terminateEventStream);
 
-  final buildPhases =
-      await createBuildPhases(targetGraph, builders, builderConfigOverrides);
+  final buildPhases = await createBuildPhases(
+      targetGraph, builders, builderConfigOverrides, isReleaseBuild ?? false);
 
-  var result = await singleBuild(environment, options, buildPhases);
+  BuildResult result;
+  if (buildPhases.isEmpty) {
+    _logger.severe('Nothing can be built, yet a build was requested.');
+    result = new BuildResult(BuildStatus.failure, []);
+  } else {
+    result = await _singleBuild(environment, options, buildPhases);
+  }
 
   await terminator.cancel();
   await options.logListener.cancel();
   return result;
 }
 
-Future<BuildResult> singleBuild(BuildEnvironment environment,
+Future<BuildResult> _singleBuild(BuildEnvironment environment,
     BuildOptions options, List<BuildPhase> buildPhases) async {
   var buildDefinition =
       await BuildDefinition.prepareWorkspace(environment, options, buildPhases);
@@ -122,7 +128,7 @@ class BuildImpl {
   final _resolvers = new AnalyzerResolvers();
   final ResourceManager _resourceManager;
   final RunnerAssetWriter _writer;
-  final String _outputDir;
+  final Map<String, String> _outputMap;
   final bool _trackPerformance;
   final bool _verbose;
   final BuildEnvironment _environment;
@@ -137,7 +143,7 @@ class BuildImpl {
         _assetGraph = buildDefinition.assetGraph,
         _resourceManager = buildDefinition.resourceManager,
         _onDelete = buildDefinition.onDelete,
-        _outputDir = options.outputDir,
+        _outputMap = options.outputMap,
         _verbose = options.verbose,
         _failOnSevere = options.failOnSevere,
         _environment = buildDefinition.environment,
@@ -165,7 +171,7 @@ class _SingleBuild {
   final bool _failOnSevere;
   final _lazyPhases = <String, Future<Iterable<AssetId>>>{};
   final OnDelete _onDelete;
-  final String _outputDir;
+  final Map<String, String> _outputMap;
   final PackageGraph _packageGraph;
   final BuildPerformanceTracker _performanceTracker;
   final AssetReader _reader;
@@ -174,8 +180,13 @@ class _SingleBuild {
   final bool _verbose;
   final RunnerAssetWriter _writer;
 
-  int numActionsCompleted = 0;
-  int numActionsStarted = 0;
+  int actionsCompletedCount = 0;
+  int actionsStartedCount = 0;
+
+  final pendingActions = new SplayTreeMap<int, Set<String>>();
+
+  /// Can't be final since it needs access to [pendingActions].
+  HungActionsHeartbeat hungActionsHeartbeat;
 
   _SingleBuild(BuildImpl buildImpl)
       : _assetGraph = buildImpl._assetGraph,
@@ -183,7 +194,7 @@ class _SingleBuild {
         _environment = buildImpl._environment,
         _failOnSevere = buildImpl._failOnSevere,
         _onDelete = buildImpl._onDelete,
-        _outputDir = buildImpl._outputDir,
+        _outputMap = buildImpl._outputMap,
         _packageGraph = buildImpl._packageGraph,
         _performanceTracker = buildImpl._trackPerformance
             ? new BuildPerformanceTracker()
@@ -192,7 +203,25 @@ class _SingleBuild {
         _resolvers = buildImpl._resolvers,
         _resourceManager = buildImpl._resourceManager,
         _verbose = buildImpl._verbose,
-        _writer = buildImpl._writer;
+        _writer = buildImpl._writer {
+    hungActionsHeartbeat = new HungActionsHeartbeat(() {
+      final message = new StringBuffer();
+      const actionsToLogMax = 5;
+      var descriptions = pendingActions.values.fold(
+          <String>[],
+          (combined, actions) =>
+              combined..addAll(actions)).take(actionsToLogMax);
+      for (final description in descriptions) {
+        message.writeln('  - $description');
+      }
+      var additionalActionsCount =
+          actionsStartedCount - actionsCompletedCount - actionsToLogMax;
+      if (additionalActionsCount > 0) {
+        message.writeln('  .. and $additionalActionsCount more');
+      }
+      return '$message';
+    });
+  }
 
   Future<BuildResult> run(Map<AssetId, ChangeType> updates) async {
     var watch = new Stopwatch()..start();
@@ -201,26 +230,17 @@ class _SingleBuild {
     }
     var result = await _safeBuild();
     await _resourceManager.disposeAll();
-    if (_failOnSevere &&
-        _assetGraph.failedActions.isNotEmpty &&
-        result.status == BuildStatus.success) {
-      int numFailing = _assetGraph.failedActions.values
-          .fold(0, (total, ids) => total + ids.length);
-      result = _convertToFailure(
-          result,
-          'There were $numFailing actions with SEVERE logs and '
-          '--fail-on-severe was passed.');
-    }
-    if (_outputDir != null && result.status == BuildStatus.success) {
-      if (!await createMergedOutputDir(_outputDir, _assetGraph, _packageGraph,
-          _reader, _environment, _buildPhases)) {
+    if (_outputMap != null && result.status == BuildStatus.success) {
+      if (!await createMergedOutputDirectories(_outputMap, _assetGraph,
+          _packageGraph, _reader, _environment, _buildPhases)) {
         result = _convertToFailure(
-            result, 'Failed to create merged output directory.');
+            result, 'Failed to create merged output directories.',
+            failureType: FailureType.cantCreate);
       }
     }
     if (result.status == BuildStatus.success) {
       _logger.info('Succeeded after ${humanReadable(watch.elapsed)} with '
-          '${result.outputs.length} outputs\n');
+          '${result.outputs.length} outputs ($actionsCompletedCount actions)\n');
     } else {
       if (result.exception is FatalBuildException) {
         // TODO(???) Really bad idea. Should not set exit codes in libraries!
@@ -232,12 +252,14 @@ class _SingleBuild {
     return result;
   }
 
-  BuildResult _convertToFailure(BuildResult previous, String errorMessge) =>
+  BuildResult _convertToFailure(BuildResult previous, String errorMessge,
+          {FailureType failureType}) =>
       new BuildResult(
         BuildStatus.failure,
         previous.outputs,
         exception: errorMessge,
         performance: previous.performance,
+        failureType: failureType,
       );
 
   Future<Null> _updateAssetGraph(Map<AssetId, ChangeType> updates) async {
@@ -259,9 +281,12 @@ class _SingleBuild {
         transformLog: (original) => '$original, ${_buildProgress()}',
         waitDuration: new Duration(seconds: 1))
       ..start();
-    done.future.then((_) {
+    hungActionsHeartbeat.start();
+    done.future.whenComplete(() {
       heartbeat.stop();
+      hungActionsHeartbeat.stop();
     });
+
     runZoned(() async {
       // Run a fresh build.
       var result = await logTimedAsync(_logger, 'Running build', _runPhases);
@@ -286,7 +311,7 @@ class _SingleBuild {
 
   /// Returns a message describing the progress of the current build.
   String _buildProgress() =>
-      '$numActionsCompleted/$numActionsStarted actions completed.';
+      '$actionsCompletedCount/$actionsStartedCount actions completed.';
 
   /// Runs the actions in [_buildPhases] and returns a [Future<BuildResult>]
   /// which completes once all [BuildPhase]s are done.
@@ -312,7 +337,10 @@ class _SingleBuild {
         _lazyPhases.values,
         (Future<Iterable<AssetId>> lazyOuts) async =>
             outputs.addAll(await lazyOuts));
-    return new BuildResult(BuildStatus.success, outputs,
+    final status = _assetGraph.failedOutputs.isEmpty
+        ? BuildStatus.success
+        : BuildStatus.failure;
+    return new BuildResult(status, outputs,
         performance: _performanceTracker..stop());
   }
 
@@ -332,6 +360,7 @@ class _SingleBuild {
           await _runLazyPhaseForInput(input.phaseNumber, input.primaryInput);
         }
         if (!input.wasOutput) return;
+        if (input.isFailure) return;
       }
       ids.add(input.id);
     }));
@@ -364,7 +393,7 @@ class _SingleBuild {
           await _runLazyPhaseForInput(
               inputNode.phaseNumber, inputNode.primaryInput);
         }
-        if (!inputNode.wasOutput) return <AssetId>[];
+        if (!inputNode.wasOutput || inputNode.isFailure) return <AssetId>[];
       }
 
       // We can never lazily build `PostProcessBuildAction`s.
@@ -388,7 +417,7 @@ class _SingleBuild {
         'Inputs should be known in the static graph. Missing $input');
     assert(
         inputNode.primaryOutputs.containsAll(builderOutputs),
-        'input $input with builder $builder missing primary outputs: \n' +
+        'input $input with builder $builder missing primary outputs: \n'
             'Got ${inputNode.primaryOutputs.join(', ')} which was missing:\n' +
             builderOutputs
                 .where((id) => !inputNode.primaryOutputs.contains(id))
@@ -410,25 +439,31 @@ class _SingleBuild {
     wrappedReader.assetsRead.clear();
 
     var wrappedWriter = new AssetWriterSpy(_writer);
-    var logger = new BuildForInputLogger(
-        new Logger(_actionLoggerName(phase, input, _packageGraph.root.name)));
-    numActionsStarted++;
+    var actionDescription =
+        _actionLoggerName(phase, input, _packageGraph.root.name);
+    var logger = new BuildForInputLogger(new Logger(actionDescription));
+
+    actionsStartedCount++;
+    pendingActions
+        .putIfAbsent(phaseNumber, () => new Set<String>())
+        .add(actionDescription);
+
+    var errorThrown = false;
     await tracker.track(
         () => runBuilder(builder, [input], wrappedReader, wrappedWriter,
-            new PerformanceTrackingResolvers(_resolvers, tracker),
-            logger: logger, resourceManager: _resourceManager),
+                new PerformanceTrackingResolvers(_resolvers, tracker),
+                logger: logger, resourceManager: _resourceManager)
+            .catchError((_) => errorThrown = true),
         'Build');
-    numActionsCompleted++;
-    if (logger.errorWasSeen) {
-      _assetGraph.markActionFailed(phaseNumber, input);
-    } else {
-      _assetGraph.markActionSucceeded(phaseNumber, input);
-    }
+    actionsCompletedCount++;
+    hungActionsHeartbeat.ping();
+    pendingActions[phaseNumber].remove(actionDescription);
 
     // Reset the state for all the `builderOutputs` nodes based on what was
     // read and written.
     await tracker.track(
-        () => _setOutputsState(builderOutputs, wrappedReader, wrappedWriter),
+        () => _setOutputsState(builderOutputs, wrappedReader, wrappedWriter,
+            (logger.errorWasSeen && _failOnSevere) || errorThrown),
         'Finalize');
 
     tracker.stop();
@@ -437,7 +472,7 @@ class _SingleBuild {
 
   Future<Iterable<AssetId>> _runPostProcessPhase(
       int phaseNum, PostBuildPhase phase) async {
-    int actionNum = 0;
+    var actionNum = 0;
     var outputLists = await Future.wait(phase.builderActions
         .map((action) => _runPostProcessAction(phaseNum, actionNum++, action)));
     return outputLists.fold<List<AssetId>>(
@@ -453,6 +488,7 @@ class _SingleBuild {
           return true;
         } else if (inputNode is GeneratedAssetNode) {
           return inputNode.wasOutput &&
+              !inputNode.isFailure &&
               inputNode.state == GeneratedNodeState.upToDate;
         }
       }
@@ -493,25 +529,48 @@ class _SingleBuild {
     anchorNode.outputs.clear();
 
     var wrappedWriter = new AssetWriterSpy(_writer);
-    var logger = new BuildForInputLogger(new Logger('$builder on $input'));
+    var actionDescription = '$builder on $input';
+    var logger = new BuildForInputLogger(new Logger(actionDescription));
 
-    numActionsStarted++;
-    await runPostProcessBuilder(builder, input, wrappedReader, wrappedWriter,
-        logger, _assetGraph, anchorNode, phaseNum);
-    numActionsCompleted++;
+    actionsStartedCount++;
+    pendingActions
+        .putIfAbsent(phaseNum, () => new Set<String>())
+        .add(actionDescription);
 
-    if (logger.errorWasSeen) {
-      _assetGraph.markActionFailed(phaseNum, input);
-    } else {
-      _assetGraph.markActionSucceeded(phaseNum, input);
-    }
+    var errorThrown = false;
+    await runPostProcessBuilder(
+        builder, input, wrappedReader, wrappedWriter, logger,
+        addAsset: (assetId) {
+      if (_assetGraph.contains(assetId)) {
+        throw new InvalidOutputException(assetId, 'Asset already exists');
+      }
+      var node = new GeneratedAssetNode(assetId,
+          primaryInput: input,
+          builderOptionsId: anchorNode.builderOptionsId,
+          isHidden: true,
+          phaseNumber: phaseNum,
+          wasOutput: true,
+          isFailure: false,
+          state: GeneratedNodeState.upToDate);
+      _assetGraph.add(node);
+      anchorNode.outputs.add(assetId);
+    }, deleteAsset: (assetId) {
+      if (!_assetGraph.contains(assetId)) {
+        throw new AssetNotFoundException(assetId);
+      }
+      _assetGraph.get(assetId).isDeleted = true;
+    }).catchError((_) => errorThrown = true);
+    actionsCompletedCount++;
+    hungActionsHeartbeat.ping();
+    pendingActions[phaseNum].remove(actionDescription);
 
     var assetsWritten = wrappedWriter.assetsWritten.toSet();
 
     // Reset the state for all the output nodes based on what was read and
     // written.
     inputNode.primaryOutputs.addAll(assetsWritten);
-    await _setOutputsState(assetsWritten, wrappedReader, wrappedWriter);
+    await _setOutputsState(assetsWritten, wrappedReader, wrappedWriter,
+        (logger.errorWasSeen && _failOnSevere) || errorThrown);
 
     return assetsWritten;
   }
@@ -524,6 +583,9 @@ class _SingleBuild {
         'Outputs should be known statically. Missing '
         '${outputs.where((o) => !_assetGraph.contains(o)).toList()}');
     assert(outputs.isNotEmpty, 'Can\'t run a build with no outputs');
+
+    // We only check the first output, because all outputs share the same inputs
+    // and invalidation state.
     var firstOutput = outputs.first;
     var node = _assetGraph.get(firstOutput) as GeneratedAssetNode;
     assert(
@@ -534,16 +596,13 @@ class _SingleBuild {
                 .isEmpty),
         'All outputs of a build action should share the same inputs.');
 
-    // We only check the first output, because all outputs share the same inputs
-    // and invalidation state.
+    // No need to build an up to date output
     if (node.state == GeneratedNodeState.upToDate) return false;
     // Early bail out condition, this is a forced update.
     if (node.state == GeneratedNodeState.definitelyNeedsUpdate) return true;
-    // TODO: Don't assume the worst for globs
-    // https://github.com/dart-lang/build/issues/624
-    if (node.previousInputsDigest == null) {
-      return true;
-    }
+    // This is a fresh build or the first time we've seen this output.
+    if (node.previousInputsDigest == null) return true;
+
     var digest = await _computeCombinedDigest(
         node.inputs, node.builderOptionsId, reader);
     if (digest != node.previousInputsDigest) {
@@ -615,26 +674,25 @@ class _SingleBuild {
   ///
   /// - Setting `needsUpdate` to `false` for each output
   /// - Setting `wasOutput` based on `writer.assetsWritten`.
+  /// - Setting `isFailed` based on action success.
   /// - Setting `globs` on each output based on `reader.globsRan`
   /// - Adding `outputs` as outputs to all `reader.assetsRead`.
   /// - Setting the `lastKnownDigest` on each output based on the new contents.
   /// - Setting the `previousInputsDigest` on each output based on the inputs.
   Future<Null> _setOutputsState(Iterable<AssetId> outputs,
-      SingleStepReader reader, AssetWriterSpy writer) async {
-    // All inputs are the same, so we only compute this once, but lazily.
-    Digest inputsDigest;
-    Set<Glob> globsRan = reader.globsRan.toSet();
+      SingleStepReader reader, AssetWriterSpy writer, bool isFailure) async {
+    if (outputs.isEmpty) return;
+
+    final inputsDigest = await _computeCombinedDigest(
+        reader.assetsRead,
+        (_assetGraph.get(outputs.first) as GeneratedAssetNode).builderOptionsId,
+        reader);
+    final globsRan = reader.globsRan.toSet();
 
     for (var output in outputs) {
       var wasOutput = writer.assetsWritten.contains(output);
       var digest = wasOutput ? await _reader.digest(output) : null;
       var node = _assetGraph.get(output) as GeneratedAssetNode;
-
-      inputsDigest ??= await () {
-        var allInputs = reader.assetsRead.toSet();
-        if (node.primaryInput != null) allInputs.add(node.primaryInput);
-        return _computeCombinedDigest(allInputs, node.builderOptionsId, reader);
-      }();
 
       // **IMPORTANT**: All updates to `node` must be synchronous. With lazy
       // builders we can run arbitrary code between updates otherwise, at which
@@ -644,9 +702,26 @@ class _SingleBuild {
       node
         ..state = GeneratedNodeState.upToDate
         ..wasOutput = wasOutput
+        ..isFailure = isFailure
         ..lastKnownDigest = digest
         ..globs = globsRan
         ..previousInputsDigest = inputsDigest;
+
+      if (isFailure) {
+        var needsMarkAsFailure = new Queue.of(node.primaryOutputs);
+        while (needsMarkAsFailure.isNotEmpty) {
+          var output = needsMarkAsFailure.removeLast();
+          var outputNode = _assetGraph.get(output) as GeneratedAssetNode;
+          outputNode
+            ..state = GeneratedNodeState.upToDate
+            ..wasOutput = false
+            ..isFailure = true
+            ..lastKnownDigest = null
+            ..globs = new Set()
+            ..previousInputsDigest = null;
+          needsMarkAsFailure.addAll(outputNode.primaryOutputs);
+        }
+      }
     }
   }
 

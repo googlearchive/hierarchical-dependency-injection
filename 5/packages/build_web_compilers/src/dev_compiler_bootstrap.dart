@@ -6,8 +6,9 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:build/build.dart';
-import 'package:path/path.dart' as _p; // ignore: library_prefixes
 import 'package:build_modules/build_modules.dart';
+import 'package:path/path.dart' as _p; // ignore: library_prefixes
+import 'package:pool/pool.dart';
 
 import 'dev_compiler_builder.dart';
 import 'web_entrypoint_builder.dart';
@@ -19,7 +20,7 @@ Future<Null> bootstrapDdc(BuildStep buildStep,
     {bool useKernel, bool buildRootAppSummary, bool ignoreCastFailures}) async {
   useKernel ??= false;
   buildRootAppSummary ??= false;
-  ignoreCastFailures ??= true;
+  ignoreCastFailures ??= false;
   var dartEntrypointId = buildStep.inputId;
   var moduleId = buildStep.inputId.changeExtension(moduleExtension);
   var module = new Module.fromJson(json
@@ -47,7 +48,11 @@ Future<Null> bootstrapDdc(BuildStep buildStep,
       var basename = p.basename(jsId.path);
       return basename.substring(0, basename.length - jsModuleExtension.length);
     } else {
-      return p.split(_ddcModuleName(jsId)).skip(1).join('__');
+      Iterable<String> scope = p.split(_ddcModuleName(jsId));
+      if (scope.first == 'packages') {
+        scope = scope.skip(1);
+      }
+      return scope.skip(1).join('__');
     }
   }();
   appModuleScope = appModuleScope.replaceAll('.', '\$46');
@@ -85,6 +90,8 @@ Future<Null> bootstrapDdc(BuildStep buildStep,
       entrypointJsContent);
 }
 
+final _lazyBuildPool = new Pool(16);
+
 /// Ensures that all transitive js modules for [module] are available and built.
 Future<List<Module>> _ensureTransitiveModules(
     Module module, AssetReader reader) async {
@@ -96,7 +103,7 @@ Future<List<Module>> _ensureTransitiveModules(
         ..add(module.jsId(jsModuleExtension));
   // Check that each module is readable, and warn otherwise.
   await Future.wait(jsModules.map((jsId) async {
-    if (await reader.canRead(jsId)) return;
+    if (await _lazyBuildPool.withResource(() => reader.canRead(jsId))) return;
     var errorsId = jsId.addExtension('.errors');
     await reader.canRead(errorsId);
     log.warning('Unable to read $jsId, check your console or the '
@@ -138,7 +145,8 @@ String _entryPointJs(String bootstrapModuleName) => '''
   $_currentDirectoryScript
   $_baseUrlScript
 
-  var mapperUri = baseUrl + "packages/\$sdk/dev_compiler/web/dart_stack_trace_mapper.js";
+  var mapperUri = baseUrl + "packages/build_web_compilers/src/" +
+      "dev_compiler_stack_trace/stack_trace_mapper.dart.js";
   var requireUri = baseUrl + "packages/\$sdk/dev_compiler/amd/require.js";
   var mainUri = _currentDirectory + "$bootstrapModuleName";
 
@@ -304,9 +312,17 @@ require.config({
 ''';
 
 final _baseUrlScript = '''
-// Attempt to detect --precompiled mode for tests, and set the base url
-// appropriately, otherwise set it to "/".
-var baseUrl = (function() {
+var baseUrl = (function () {
+  // Attempt to detect base url using <base href> html tag
+  // base href should start with "/"
+  if (typeof document !== 'undefined') {
+    var el = document.getElementsByTagName('base');
+    if (el && el[0] && el[0].href && el[0].href.startsWith('/')){
+    	return el[0].href;
+    }
+  }
+  // Attempt to detect --precompiled mode for tests, and set the base url
+  // appropriately, otherwise set it to '/'.
   var pathParts = location.pathname.split("/");
   if (pathParts[0] == "") {
     pathParts.shift();

@@ -1,7 +1,5 @@
 import 'package:angular_compiler/cli.dart';
-import 'package:angular/src/facade/exceptions.dart';
 import 'package:angular_ast/angular_ast.dart' as ast;
-import 'package:angular_ast/src/expression/micro.dart';
 import 'package:source_span/source_span.dart';
 
 import 'chars.dart';
@@ -19,16 +17,17 @@ import 'template_ast.dart' as ng;
 import 'template_optimize.dart';
 import 'template_parser.dart';
 import 'template_parser/recursive_template_visitor.dart';
-import 'template_preparser.dart';
 
-// TODO: Remove the following lines (for --no-implicit-casts).
-// ignore_for_file: argument_type_not_assignable
-// ignore_for_file: invalid_assignment
-// ignore_for_file: list_element_type_not_assignable
-// ignore_for_file: non_bool_operand
-// ignore_for_file: return_of_invalid_type
-
+const ngContentSelectAttr = 'select';
+const ngContentElement = 'ng-content';
+const linkElement = 'link';
+const linkStyleRelAttr = 'rel';
+const linkStyleHrefAttr = 'href';
+const linkStyleRelValue = 'stylesheet';
+const styleElement = 'style';
+const scriptElement = 'script';
 const _templateElement = 'template';
+final CssSelector _textCssSelector = CssSelector.parse('*')[0];
 
 /// A [TemplateParser] which uses the `angular_ast` package to parse angular
 /// templates.
@@ -60,7 +59,7 @@ class AstTemplateParser implements TemplateParser {
       List<CompileDirectiveMetadata> directives,
       List<CompilePipeMetadata> pipes,
       String name) {
-    final exceptionHandler = new _AstExceptionHandler(template, name);
+    final exceptionHandler = new AstExceptionHandler(template, name);
 
     final parsedAst = _parseTemplate(template, name, exceptionHandler);
     exceptionHandler.maybeReportExceptions();
@@ -86,8 +85,8 @@ class AstTemplateParser implements TemplateParser {
     return processedAsts;
   }
 
-  List<ast.TemplateAst> _parseTemplate(String template, String name,
-          _AstExceptionHandler exceptionHandler) =>
+  List<ast.TemplateAst> _parseTemplate(
+          String template, String name, AstExceptionHandler exceptionHandler) =>
       ast.parse(template,
           sourceUrl: name,
           desugar: true,
@@ -96,14 +95,13 @@ class AstTemplateParser implements TemplateParser {
           exceptionHandler: exceptionHandler);
 
   List<ast.TemplateAst> _processRawTemplateNodes(
-      Iterable<ast.TemplateAst> parsedAst,
+      List<ast.TemplateAst> parsedAst,
       {String template,
       String name,
-      _AstExceptionHandler exceptionHandler,
+      AstExceptionHandler exceptionHandler,
       bool preserveWhitespace: false}) {
     final implicNamespace = _applyImplicitNamespace(parsedAst);
-    final desugaredAst = _inlineTemplates(implicNamespace, exceptionHandler);
-    var filterElements = _filterElements(desugaredAst, preserveWhitespace);
+    var filterElements = _filterElements(implicNamespace, preserveWhitespace);
     _validateTemplate(filterElements, exceptionHandler);
     return filterElements;
   }
@@ -112,7 +110,7 @@ class AstTemplateParser implements TemplateParser {
       List<CompileDirectiveMetadata> directives,
       CompileDirectiveMetadata compMeta,
       List<ast.TemplateAst> filteredAst,
-      _AstExceptionHandler exceptionHandler,
+      AstExceptionHandler exceptionHandler,
       SourceSpan span) {
     final boundAsts =
         _bindDirectives(directives, compMeta, filteredAst, exceptionHandler);
@@ -123,25 +121,23 @@ class AstTemplateParser implements TemplateParser {
       CompileDirectiveMetadata compMeta,
       List<ng.TemplateAst> providedAsts,
       List<CompilePipeMetadata> pipes,
-      _AstExceptionHandler exceptionHandler) {
+      AstExceptionHandler exceptionHandler) {
     final optimizedAsts = _optimize(compMeta, providedAsts);
     final sortedAsts = _sortInputs(optimizedAsts);
     _validatePipeNames(sortedAsts, pipes, exceptionHandler);
     return sortedAsts;
   }
 
-  List<ast.TemplateAst> _inlineTemplates(List<ast.TemplateAst> parsedAst,
-          ast.ExceptionHandler exceptionHandler) =>
-      parsedAst
-          .map((asNode) =>
-              asNode.accept(new _InlineTemplateDesugar(exceptionHandler)))
-          .toList();
-
   List<ast.TemplateAst> _filterElements(
       List<ast.TemplateAst> parsedAst, bool preserveWhitespace) {
-    var filteredElements = new _ElementFilter().visitAll(parsedAst);
+    var filteredElements = new _ElementFilter()
+        .visitAll<ast.StandaloneTemplateAst>(
+            parsedAst.cast<ast.StandaloneTemplateAst>());
     if (flags.useNewPreserveWhitespace) {
-      return new ast.MinimizeWhitespaceVisitor().visitAll(filteredElements);
+      if (!preserveWhitespace) {
+        return filteredElements;
+      }
+      return new ast.MinimizeWhitespaceVisitor().visitAllRoot(filteredElements);
     }
     return new _PreserveWhitespaceVisitor()
         .visitAll(filteredElements, preserveWhitespace);
@@ -151,7 +147,7 @@ class AstTemplateParser implements TemplateParser {
       List<CompileDirectiveMetadata> directives,
       CompileDirectiveMetadata compMeta,
       List<ast.TemplateAst> filteredAst,
-      _AstExceptionHandler exceptionHandler) {
+      AstExceptionHandler exceptionHandler) {
     final visitor = new _BindDirectivesVisitor();
     final context = new _ParseContext.forRoot(new _TemplateContext(
         parser: parser,
@@ -166,7 +162,7 @@ class AstTemplateParser implements TemplateParser {
       CompileDirectiveMetadata compMeta,
       List<ng.TemplateAst> visitedAsts,
       SourceSpan sourceSpan,
-      _AstExceptionHandler exceptionHandler) {
+      AstExceptionHandler exceptionHandler) {
     var providerViewContext = new ProviderViewContext(compMeta, sourceSpan);
     final providerVisitor = new _ProviderVisitor(providerViewContext);
     final ProviderElementContext providerContext = new ProviderElementContext(
@@ -190,7 +186,7 @@ class AstTemplateParser implements TemplateParser {
           .toList();
 
   void _validatePipeNames(List<ng.TemplateAst> parsedAsts,
-      List<CompilePipeMetadata> pipes, _AstExceptionHandler exceptionHandler) {
+      List<CompilePipeMetadata> pipes, AstExceptionHandler exceptionHandler) {
     var pipeValidator =
         new _PipeValidator(removeDuplicates(pipes), exceptionHandler);
     for (final ast in parsedAsts) {
@@ -199,52 +195,10 @@ class AstTemplateParser implements TemplateParser {
   }
 
   void _validateTemplate(
-      List<ast.TemplateAst> parsedAst, _AstExceptionHandler exceptionHandler) {
+      List<ast.TemplateAst> parsedAst, AstExceptionHandler exceptionHandler) {
     for (final ast in parsedAst) {
       ast.accept(new _TemplateValidator(exceptionHandler));
     }
-  }
-}
-
-class _AstExceptionHandler extends ast.RecoveringExceptionHandler {
-  final String template;
-  final String sourceUrl;
-
-  final parseErrors = <ParseError>[];
-
-  _AstExceptionHandler(this.template, this.sourceUrl);
-
-  void handleParseError(ParseError error) {
-    parseErrors.add(error);
-  }
-
-  void handleAll(Iterable<ParseError> errors) {
-    parseErrors.addAll(errors);
-  }
-
-  void maybeReportExceptions() {
-    if (exceptions.isNotEmpty) {
-      // We always throw here, so no need to clear the list.
-      _reportExceptions();
-    }
-    if (parseErrors.isNotEmpty) {
-      // TODO(alorenzen): Once this is no longer used for the legacy parser,
-      // rename to reportParseErrors.
-      handleParseErrors(parseErrors);
-      // handleParseErrors() may only log warnings and not throw, so we need to
-      // clear the list before the next phase.
-      parseErrors.clear();
-    }
-  }
-
-  void _reportExceptions() {
-    final sourceFile = new SourceFile.fromString(template, url: sourceUrl);
-    final errorString = exceptions
-        .map((exception) => sourceFile
-            .span(exception.offset, exception.offset + exception.length)
-            .message(exception.errorCode.message))
-        .join('\n');
-    throw new BaseException('Template parse errors:\n$errorString');
   }
 }
 
@@ -288,7 +242,8 @@ class _BindDirectivesVisitor
       List<ast.PropertyAst> properties,
       List<ast.AttributeAst> attributes,
       _ParseContext elementContext) {
-    var visitedProperties = _visitAll(properties, elementContext);
+    var visitedProperties =
+        _visitAll<ng.BoundElementPropertyAst>(properties, elementContext);
     for (var attribute in attributes) {
       if (attribute.mustaches?.isNotEmpty ?? false) {
         var boundElementPropertyAst =
@@ -355,7 +310,8 @@ class _BindDirectivesVisitor
     if (_isInlineTemplate(astNode)) {
       return _findNgContentIndexForElement(
           astNode.childNodes
-              .firstWhere((childNode) => childNode is ast.ElementAst),
+                  .firstWhere((childNode) => childNode is ast.ElementAst)
+              as ast.ElementAst,
           context);
     }
     return context.findNgContentIndex(_templateSelector(astNode));
@@ -365,7 +321,7 @@ class _BindDirectivesVisitor
     if (astNode is! ast.SyntheticTemplateAst) return false;
     final syntheticNode = astNode as ast.SyntheticTemplateAst;
     if (syntheticNode.origin is ast.EmbeddedTemplateAst) {
-      return _isInlineTemplate(syntheticNode.origin);
+      return _isInlineTemplate(syntheticNode.origin as ast.EmbeddedTemplateAst);
     }
     if (syntheticNode.origin is ast.StarAst ||
         syntheticNode.origin is ast.AttributeAst) return true;
@@ -387,8 +343,8 @@ class _BindDirectivesVisitor
   CssSelector _embeddedContentSelector(ast.EmbeddedContentAst astNode) =>
       astNode.ngProjectAs != null
           ? CssSelector.parse(astNode.ngProjectAs)[0]
-          : createElementCssSelector(NG_CONTENT_ELEMENT, [
-              [NG_CONTENT_SELECT_ATTR, astNode.selector]
+          : createElementCssSelector(ngContentElement, [
+              [ngContentSelectAttr, astNode.selector]
             ]);
 
   @override
@@ -422,12 +378,27 @@ class _BindDirectivesVisitor
           astNode.value ?? '',
           _location(astNode),
           context.templateContext.exports);
-      // If we bind the property to a directive input, or the element is a
-      // template element, then we don't want to bind the property to the element.
-      if (context.bindPropertyToDirective(astNode, value) ||
-          context.isTemplate) {
+
+      // Attempt binding to a directive input.
+      if (context.bindPropertyToDirective(astNode, value)) return null;
+
+      // Properties on a <template> must be bound to directive inputs since
+      // <template> is not an HTML element.
+      if (context.isTemplate) {
+        final name = astNode.name;
+        var message = "Can't bind to '$name' since it isn't an input of any "
+            "bound directive. Please check that the spelling is correct, and "
+            "that the intended directive is included in the host component's "
+            "list of directives.";
+        if (name == 'ngForIn') {
+          message = "$message\n\nThis is a common mistake when using *ngFor; "
+              "did you mean to write 'of' instead of 'in'?";
+        }
+        context.templateContext.reportError(message, astNode.sourceSpan);
         return null;
       }
+
+      // Attempt binding to an HTML element property.
       return createElementPropertyAst(
           context.elementName,
           _getPropertyName(astNode),
@@ -457,7 +428,7 @@ class _BindDirectivesVisitor
   @override
   ng.TemplateAst visitText(ast.TextAst astNode, [_ParseContext context]) =>
       new ng.TextAst(astNode.value,
-          context.findNgContentIndex(TEXT_CSS_SELECTOR), astNode.sourceSpan);
+          context.findNgContentIndex(_textCssSelector), astNode.sourceSpan);
 
   @override
   ng.TemplateAst visitInterpolation(ast.InterpolationAst astNode,
@@ -468,7 +439,7 @@ class _BindDirectivesVisitor
           _location(astNode),
           context.templateContext.exports);
       return new ng.BoundTextAst(element,
-          context.findNgContentIndex(TEXT_CSS_SELECTOR), astNode.sourceSpan);
+          context.findNgContentIndex(_textCssSelector), astNode.sourceSpan);
     } on ParseException catch (e) {
       context.templateContext.reportError(e.message, astNode.sourceSpan);
       return null;
@@ -521,7 +492,7 @@ class _TemplateContext {
   final ElementSchemaRegistry schemaRegistry;
   final List<CompileDirectiveMetadata> directives;
   final List<CompileIdentifierMetadata> exports;
-  final _AstExceptionHandler exceptionHandler;
+  final AstExceptionHandler exceptionHandler;
 
   _TemplateContext(
       {this.parser,
@@ -654,9 +625,9 @@ class _ParseContext {
 
   int findNgContentIndex(CssSelector selector) {
     if (_ngContentIndexMatcher == null) return _wildcardNgContentIndex;
-    var ngContentIndices = [];
+    var ngContentIndices = <int>[];
     _ngContentIndexMatcher.match(selector, (selector, ngContentIndex) {
-      ngContentIndices.add(ngContentIndex);
+      ngContentIndices.add(ngContentIndex as int);
     });
     ngContentIndices.sort();
     return ngContentIndices.isNotEmpty
@@ -719,7 +690,7 @@ class _ParseContext {
       String elementName,
       String location,
       _TemplateContext templateContext) {
-    var result = [];
+    var result = <ng.BoundElementPropertyAst>[];
     for (var propName in directive.hostProperties.keys) {
       try {
         var expression = directive.hostProperties[propName];
@@ -746,7 +717,7 @@ class _ParseContext {
       String elementName,
       String location,
       _TemplateContext templateContext) {
-    var result = [];
+    var result = <ng.BoundEventAst>[];
     for (var eventName in directive.hostListeners.keys) {
       try {
         var expression = directive.hostListeners[eventName];
@@ -799,7 +770,7 @@ CssSelector _templateSelector(ast.EmbeddedTemplateAst astNode) => _selector(
 
 CssSelector _selector(String elementName, List<ast.AttributeAst> attributes,
     List<ast.PropertyAst> properties, List<ast.EventAst> events) {
-  final matchableAttributes = [];
+  final matchableAttributes = <List<String>>[];
   for (var attr in attributes) {
     matchableAttributes.add([attr.name, attr.value]);
   }
@@ -831,11 +802,11 @@ String _getEventName(ast.EventAst event) =>
 /// Visitor which filters elements that are not supported in angular templates.
 class _ElementFilter extends ast.RecursiveTemplateAstVisitor<Null> {
   @override
-  ast.TemplateAst visitElement(ast.ElementAst astNode, [_]) {
+  ast.ElementAst visitElement(ast.ElementAst astNode, [_]) {
     if (_filterElement(astNode)) {
       return null;
     }
-    return super.visitElement(astNode);
+    return super.visitElement(astNode) as ast.ElementAst;
   }
 
   static bool _filterElement(ast.ElementAst astNode) =>
@@ -844,20 +815,20 @@ class _ElementFilter extends ast.RecursiveTemplateAstVisitor<Null> {
       _filterStyleSheets(astNode);
 
   static bool _filterStyles(ast.ElementAst astNode) =>
-      astNode.name.toLowerCase() == STYLE_ELEMENT;
+      astNode.name.toLowerCase() == styleElement;
 
   static bool _filterScripts(ast.ElementAst astNode) =>
-      astNode.name.toLowerCase() == SCRIPT_ELEMENT;
+      astNode.name.toLowerCase() == scriptElement;
 
   static bool _filterStyleSheets(ast.ElementAst astNode) {
-    if (astNode.name != LINK_ELEMENT) return false;
+    if (astNode.name != linkElement) return false;
     var href = _findHref(astNode.attributes);
     return isStyleUrlResolvable(href?.value);
   }
 
   static ast.AttributeAst _findHref(List<ast.AttributeAst> attributes) {
     for (var attr in attributes) {
-      if (attr.name.toLowerCase() == LINK_STYLE_HREF_ATTR) return attr;
+      if (attr.name.toLowerCase() == linkStyleHrefAttr) return attr;
     }
     return null;
   }
@@ -929,98 +900,6 @@ class _ProviderVisitor
   }
 }
 
-/// Visitor which extracts inline templates.
-// TODO(alorenzen): Refactor this into pkg:angular_ast.
-class _InlineTemplateDesugar extends ast.RecursiveTemplateAstVisitor<Null> {
-  final ast.ExceptionHandler exceptionHandler;
-
-  _InlineTemplateDesugar(this.exceptionHandler);
-
-  @override
-  ast.TemplateAst visitElement(ast.ElementAst astNode, [_]) {
-    astNode = super.visitElement(astNode);
-    var templateAttribute = _findTemplateAttribute(astNode);
-    if (templateAttribute == null) {
-      return astNode;
-    }
-
-    astNode.attributes.remove(templateAttribute);
-
-    if (templateAttribute.value == null) {
-      return new ast.EmbeddedTemplateAst.from(templateAttribute,
-          childNodes: [astNode]);
-    }
-
-    var name = _getName(templateAttribute.value);
-    var expression = _getExpression(templateAttribute.value);
-    final properties = <ast.PropertyAst>[];
-    final letBindings = <ast.LetBindingAst>[];
-    if (isMicroExpression(expression)) {
-      NgMicroAst micro;
-      var expressionOffset = _expressionOffset(templateAttribute);
-      try {
-        micro = parseMicroExpression(
-          name,
-          expression,
-          expressionOffset,
-          sourceUrl: astNode.sourceUrl,
-          origin: templateAttribute,
-        );
-        if (micro != null) {
-          properties.addAll(micro.properties);
-          letBindings.addAll(micro.letBindings);
-        }
-        return new ast.EmbeddedTemplateAst.from(templateAttribute,
-            properties: properties,
-            letBindings: letBindings,
-            attributes: name != null
-                ? [new ast.AttributeAst.from(templateAttribute, name)]
-                : [],
-            childNodes: [astNode]);
-      } on ast.AngularParserException catch (e) {
-        exceptionHandler.handle(e);
-        return null;
-      }
-    } else {
-      return new ast.EmbeddedTemplateAst.from(templateAttribute, properties: [
-        new ast.PropertyAst.from(templateAttribute, name, expression)
-      ], childNodes: [
-        astNode
-      ]);
-    }
-  }
-
-  ast.AttributeAst _findTemplateAttribute(ast.ElementAst astNode) =>
-      astNode.attributes
-          .firstWhere((attr) => attr.name == 'template', orElse: () => null);
-
-  String _getName(String value) {
-    var spaceIndex = value.indexOf(' ');
-    var name = spaceIndex == -1 ? value : value.substring(0, spaceIndex);
-    if (name == 'let') return null;
-    return name.replaceAll(':', '');
-  }
-
-  String _getExpression(String value) {
-    var spaceIndex = value.indexOf(' ');
-    if (spaceIndex == -1) return null;
-    if (value.substring(0, spaceIndex) == 'let') return value;
-    return value.substring(spaceIndex + 1);
-  }
-
-  int _expressionOffset(ast.AttributeAst templateAttribute) {
-    if (templateAttribute == null) return null;
-    if (templateAttribute is ast.SyntheticTemplateAst) {
-      return _expressionOffset(
-          (templateAttribute as ast.SyntheticTemplateAst).origin);
-    }
-    return (templateAttribute as ast.ParsedAttributeAst)
-        .valueToken
-        ?.innerValue
-        ?.offset;
-  }
-}
-
 /// Visitor that applies default namespaces to elements.
 // TODO(alorenzen): Refactor this into pkg:angular_ast.
 class _NamespaceVisitor extends ast.RecursiveTemplateAstVisitor<String> {
@@ -1048,7 +927,7 @@ class _NamespaceVisitor extends ast.RecursiveTemplateAstVisitor<String> {
 
   @override
   visitAttribute(ast.AttributeAst astNode, [String parentPrefix]) {
-    astNode = super.visitAttribute(astNode, parentPrefix);
+    astNode = super.visitAttribute(astNode, parentPrefix) as ast.AttributeAst;
     if (_getNsPrefix(astNode.name) == null) return astNode;
     var names = astNode.name.split(':');
     return new ast.AttributeAst.from(astNode,
@@ -1069,7 +948,7 @@ class _NamespaceVisitor extends ast.RecursiveTemplateAstVisitor<String> {
 }
 
 class _TemplateValidator extends ast.RecursiveTemplateAstVisitor<Null> {
-  final _AstExceptionHandler exceptionHandler;
+  final AstExceptionHandler exceptionHandler;
 
   _TemplateValidator(this.exceptionHandler);
 
@@ -1203,11 +1082,11 @@ class _TemplateValidator extends ast.RecursiveTemplateAstVisitor<Null> {
 /// arguments.
 class _PipeValidator extends RecursiveTemplateVisitor<Null> {
   final Map<String, CompilePipeMetadata> _pipesByName;
-  final _AstExceptionHandler _exceptionHandler;
+  final AstExceptionHandler _exceptionHandler;
 
   factory _PipeValidator(
     List<CompilePipeMetadata> pipes,
-    _AstExceptionHandler exceptionHandler,
+    AstExceptionHandler exceptionHandler,
   ) {
     final pipesByName = <String, CompilePipeMetadata>{};
     for (var pipe in pipes) {
@@ -1295,7 +1174,7 @@ class _PreserveWhitespaceVisitor extends ast.IdentityTemplateAstVisitor<bool> {
       final visited = node is ast.TextAst
           ? _stripWhitespace(i, node, astNodes, preserveWhitespace)
           : node.accept(this, preserveWhitespace);
-      if (visited != null) result.add(visited);
+      if (visited != null) result.add(visited as T);
     }
     return result;
   }
@@ -1367,7 +1246,7 @@ class _SortInputsVisitor extends RecursiveTemplateVisitor<Null> {
   @override
   ng.DirectiveAst visitDirective(ng.DirectiveAst ast, _) {
     ast.inputs.sort(_orderingOf(ast.directive.inputs));
-    return super.visitDirective(ast, null);
+    return super.visitDirective(ast, null) as ng.DirectiveAst;
   }
 
   Comparator<ng.BoundDirectivePropertyAst> _orderingOf(

@@ -3,10 +3,7 @@ import 'package:angular/core.dart' show DoCheck, Directive, Input;
 import '../../core/change_detection/differs/default_iterable_differ.dart'
     show DefaultIterableDiffer, CollectionChangeRecord, TrackByFn;
 import '../../core/linker.dart'
-    show ViewContainerRef, ViewRef, TemplateRef, EmbeddedViewRef;
-
-// TODO: Remove the following line (for --no-implicit-casts).
-// ignore_for_file: argument_type_not_assignable
+    show ViewContainerRef, TemplateRef, EmbeddedViewRef;
 
 /// The `NgFor` directive instantiates a template once per item from an
 /// iterable. The context for each instantiated template inherits from the outer
@@ -76,11 +73,6 @@ import '../../core/linker.dart'
 ///   ({{i}}) {{hero.name}}
 /// </div>
 ///
-/// <div template="ngFor let hero of heroes; let i=index; let odd=odd; trackBy: trackById"
-///      [class.odd]="odd">
-///   ({{i}}) {{hero.name}}
-/// </div>
-///
 /// <template ngFor let-hero [ngForOf]="heroes" let-i="index" let-odd="odd"
 ///           [ngForTrackBy]="trackById">
 ///   <div [class.odd]="odd">({{i}}) {{hero.name}}</div>
@@ -105,12 +97,8 @@ class NgFor implements DoCheck {
   NgFor(this._viewContainer, this._templateRef);
 
   @Input()
-  set ngForOf(value) {
-    assert(
-        value == null || value is Iterable,
-        'Cannot diff `$value`. $NgFor only supports binding to something that '
-        'implements the `Iterable` interface, such as `List`.');
-    _ngForOf = value as Iterable;
+  set ngForOf(Iterable value) {
+    _ngForOf = value;
     if (_differ == null && value != null) {
       _differ = new DefaultIterableDiffer(_ngForTrackBy);
     }
@@ -161,9 +149,9 @@ class NgFor implements DoCheck {
       } else if (currentIndex == null) {
         _viewContainer.remove(adjustedPreviousIndex);
       } else {
-        ViewRef view = _viewContainer.get(adjustedPreviousIndex);
+        var view = _viewContainer.get(adjustedPreviousIndex);
         _viewContainer.move(view, currentIndex);
-        RecordViewTuple tuple = new RecordViewTuple(item, view);
+        var tuple = new RecordViewTuple(item, view);
         insertTuples.add(tuple);
       }
     });
@@ -193,6 +181,6 @@ class NgFor implements DoCheck {
 
 class RecordViewTuple {
   final EmbeddedViewRef view;
-  final dynamic record;
+  final CollectionChangeRecord record;
   RecordViewTuple(this.record, this.view);
 }

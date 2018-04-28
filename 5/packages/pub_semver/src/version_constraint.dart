@@ -3,10 +3,10 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'patterns.dart';
+import 'utils.dart';
 import 'version.dart';
 import 'version_range.dart';
 import 'version_union.dart';
-import 'utils.dart';
 
 /// A [VersionConstraint] is a predicate that can determine whether a given
 /// version is valid or not.
@@ -57,7 +57,7 @@ abstract class VersionConstraint {
     if (text == "any") return any;
 
     // Try to parse and consume a version number.
-    matchVersion() {
+    Version matchVersion() {
       var version = START_VERSION.firstMatch(text);
       if (version == null) return null;
 
@@ -66,7 +66,7 @@ abstract class VersionConstraint {
     }
 
     // Try to parse and consume a comparison operator followed by a version.
-    matchComparison() {
+    VersionRange matchComparison() {
       var comparison = START_COMPARISON.firstMatch(text);
       if (comparison == null) return null;
 
@@ -81,10 +81,14 @@ abstract class VersionConstraint {
       }
 
       switch (op) {
-        case '<=': return new VersionRange(max: version, includeMax: true);
-        case '<': return new VersionRange(max: version, includeMax: false);
-        case '>=': return new VersionRange(min: version, includeMin: true);
-        case '>': return new VersionRange(min: version, includeMin: false);
+        case '<=':
+          return new VersionRange(max: version, includeMax: true);
+        case '<':
+          return new VersionRange(max: version, includeMax: false);
+        case '>=':
+          return new VersionRange(min: version, includeMin: true);
+        case '>':
+          return new VersionRange(min: version, includeMin: false);
       }
       throw "Unreachable.";
     }
@@ -113,35 +117,55 @@ abstract class VersionConstraint {
     var compatibleWith = matchCompatibleWith();
     if (compatibleWith != null) return compatibleWith;
 
-    var constraints = <VersionConstraint>[];
+    Version min;
+    var includeMin = false;
+    Version max;
+    var includeMax = false;
 
     while (true) {
       skipWhitespace();
 
       if (text.isEmpty) break;
 
-      var version = matchVersion();
-      if (version != null) {
-        constraints.add(version);
-        continue;
+      var newRange = matchVersion() ?? matchComparison();
+      if (newRange == null) {
+        throw new FormatException('Could not parse version "$originalText". '
+            'Unknown text at "$text".');
       }
 
-      var comparison = matchComparison();
-      if (comparison != null) {
-        constraints.add(comparison);
-        continue;
+      if (newRange.min != null) {
+        if (min == null || newRange.min > min) {
+          min = newRange.min;
+          includeMin = newRange.includeMin;
+        } else if (newRange.min == min && !newRange.includeMin) {
+          includeMin = false;
+        }
       }
 
-      // If we got here, we couldn't parse the remaining string.
-      throw new FormatException('Could not parse version "$originalText". '
-          'Unknown text at "$text".');
+      if (newRange.max != null) {
+        if (max == null || newRange.max < max) {
+          max = newRange.max;
+          includeMax = newRange.includeMax;
+        } else if (newRange.max == max && !newRange.includeMax) {
+          includeMax = false;
+        }
+      }
     }
 
-    if (constraints.isEmpty) {
+    if (min == null && max == null) {
       throw new FormatException('Cannot parse an empty string.');
     }
 
-    return new VersionConstraint.intersection(constraints);
+    if (min != null && max != null) {
+      if (min > max) return VersionConstraint.empty;
+      if (min == max) {
+        if (includeMin && includeMax) return min;
+        return VersionConstraint.empty;
+      }
+    }
+
+    return new VersionRange(
+        min: min, includeMin: includeMin, max: max, includeMax: includeMax);
   }
 
   /// Creates a version constraint which allows all versions that are
@@ -172,8 +196,7 @@ abstract class VersionConstraint {
   ///
   /// It allows any versions that any of those constraints allows. If
   /// [constraints] is empty, this returns a constraint that allows no versions.
-  factory VersionConstraint.unionOf(
-          Iterable<VersionConstraint> constraints) {
+  factory VersionConstraint.unionOf(Iterable<VersionConstraint> constraints) {
     var flattened = constraints.expand((constraint) {
       if (constraint.isEmpty) return [];
       if (constraint is VersionUnion) return constraint.ranges;
@@ -257,9 +280,12 @@ class _EmptyVersion implements VersionConstraint {
 }
 
 class _CompatibleWithVersionRange extends VersionRange {
-  _CompatibleWithVersionRange(Version version) : super(
-      min: version, includeMin: true,
-      max: version.nextBreaking, includeMax: false);
+  _CompatibleWithVersionRange(Version version)
+      : super(
+            min: version,
+            includeMin: true,
+            max: version.nextBreaking,
+            includeMax: false);
 
   String toString() => '^$min';
 }

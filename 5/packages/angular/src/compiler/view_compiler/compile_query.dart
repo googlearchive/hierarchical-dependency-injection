@@ -5,6 +5,7 @@ import "../identifiers.dart" show Identifiers;
 import "../output/output_ast.dart" as o;
 import "compile_element.dart" show CompileElement;
 import "compile_view.dart" show CompileView;
+import 'ir/provider_source.dart';
 import 'ir/view_storage.dart';
 import "view_compiler_utils.dart" show getPropertyInView;
 
@@ -26,13 +27,10 @@ class _QueryValues {
 /// Uses a conditional compilation strategy in order to deprecate `QueryList`:
 /// https://github.com/dart-lang/angular/issues/688
 abstract class CompileQuery {
-  static bool _useNewQuery(CompileQueryMetadata metadata) =>
-      !metadata.isQueryListType;
-
   /// An expression that accesses the component's instance.
   ///
   /// In practice, this is almost always `this.ctx`.
-  final o.Expression _boundField;
+  final ProviderSource _boundDirective;
 
   /// Extracted metadata information from the user-code.
   final CompileQueryMetadata metadata;
@@ -53,25 +51,15 @@ abstract class CompileQuery {
     @required CompileQueryMetadata metadata,
     @required ViewStorage storage,
     @required CompileView queryRoot,
-    @required o.Expression boundField,
+    @required ProviderSource boundDirective,
     @required int nodeIndex,
     @required int queryIndex,
   }) {
-    if (_useNewQuery(metadata)) {
-      return new _ListCompileQuery(
-        metadata,
-        storage,
-        queryRoot,
-        boundField,
-        nodeIndex: nodeIndex,
-        queryIndex: queryIndex,
-      );
-    }
-    return new _QueryListCompileQuery(
+    return new _ListCompileQuery(
       metadata,
       storage,
       queryRoot,
-      boundField,
+      boundDirective,
       nodeIndex: nodeIndex,
       queryIndex: queryIndex,
     );
@@ -81,25 +69,15 @@ abstract class CompileQuery {
     @required CompileQueryMetadata metadata,
     @required ViewStorage storage,
     @required CompileView queryRoot,
-    @required o.Expression boundField,
+    @required ProviderSource boundDirective,
     @required int queryIndex,
   }) {
-    if (_useNewQuery(metadata)) {
-      return new _ListCompileQuery(
-        metadata,
-        storage,
-        queryRoot,
-        boundField,
-        nodeIndex: 1,
-        queryIndex: queryIndex,
-      );
-    }
-    return new _QueryListCompileQuery(
+    return new _ListCompileQuery(
       metadata,
       storage,
       queryRoot,
-      boundField,
-      nodeIndex: -1,
+      boundDirective,
+      nodeIndex: 1,
       queryIndex: queryIndex,
     );
   }
@@ -107,7 +85,7 @@ abstract class CompileQuery {
   CompileQuery._base(
     this.metadata,
     this._queryRoot,
-    this._boundField,
+    this._boundDirective,
   ) : _values = new _QueryValues(_queryRoot);
 
   /// Whether this query requires "flattenNodes".
@@ -317,107 +295,6 @@ abstract class CompileQuery {
   List<o.Statement> createImmediateUpdates();
 }
 
-class _QueryListCompileQuery extends CompileQuery {
-  o.Expression _queryList;
-  ViewStorageItem _storageItem;
-
-  _QueryListCompileQuery(
-    CompileQueryMetadata metadata,
-    ViewStorage storage,
-    CompileView queryRoot,
-    o.Expression boundField, {
-    @required int nodeIndex,
-    @required int queryIndex,
-  }) : super._base(metadata, queryRoot, boundField) {
-    _queryList = _createQueryListField(
-      storage: storage,
-      metadata: metadata,
-      nodeIndex: nodeIndex,
-      queryIndex: queryIndex,
-    );
-  }
-
-  @override
-  final _needsFlattening = false;
-
-  /// Inserts a `QueryList {property}` field in the generated view.
-  ///
-  /// Returns an expression pointing to that field.
-  o.Expression _createQueryListField({
-    @required ViewStorage storage,
-    @required CompileQueryMetadata metadata,
-    @required int nodeIndex,
-    @required int queryIndex,
-  }) {
-    final selector = metadata.selectors.first.name;
-    // This is to avoid churn in the golden files/output while debugging.
-    //
-    // We can rename the properties after we decide to keep this code branch.
-    String property;
-    if (nodeIndex == -1) {
-      // @ViewChild[ren].
-      property = '_viewQuery_${selector}_$queryIndex';
-    } else {
-      // @ContentChild[ren].
-      property = '_query_${selector}_${nodeIndex}_$queryIndex';
-    }
-    // final QueryList _query_foo_0_0 = new QueryList();
-    _storageItem = storage.allocate(
-      property,
-      outputType: o.importType(Identifiers.QueryList),
-      modifiers: [o.StmtModifier.Private, o.StmtModifier.Final],
-      initializer: o.importExpr(Identifiers.QueryList).instantiate([]),
-    );
-    return storage.buildReadExpr(_storageItem);
-  }
-
-  @override
-  void _setParentQueryAsDirty(CompileView origin) {
-    final queryListField = getPropertyInView(_queryList, origin, _queryRoot);
-    origin.dirtyParentQueriesMethod.addStmt(
-      queryListField.callMethod('setDirty', []).toStmt(),
-    );
-  }
-
-  @override
-  List<o.Statement> createDynamicUpdates() {
-    if (_isSingle && _isStatic) {
-      return const [];
-    }
-    return _createUpdates();
-  }
-
-  @override
-  List<o.Statement> createImmediateUpdates() {
-    if (_isStatic && _isSingle) {
-      return _createUpdates();
-    }
-    return const [];
-  }
-
-  List<o.Statement> _createUpdates() {
-    final values = _buildQueryResult(_values);
-    final statements = [
-      _queryList.callMethod('reset', [o.literalArr(values)]).toStmt(),
-    ];
-    if (_boundField != null) {
-      final valueExpr = _isSingle ? _queryList.prop('first') : _queryList;
-      statements.add(
-        _boundField.prop(metadata.propertyName).set(valueExpr).toStmt(),
-      );
-    }
-    if (!_isSingle) {
-      statements.add(
-        _queryList.callMethod('notifyOnChanges', []).toStmt(),
-      );
-    }
-    if (_isStatic && _isSingle) {
-      return statements;
-    }
-    return [new o.IfStmt(_queryList.prop('dirty'), statements)];
-  }
-}
-
 class _ListCompileQuery extends CompileQuery {
   ViewStorageItem _dirtyField;
   ViewStorage _storage;
@@ -426,10 +303,10 @@ class _ListCompileQuery extends CompileQuery {
     CompileQueryMetadata metadata,
     ViewStorage storage,
     CompileView queryRoot,
-    o.Expression boundField, {
+    ProviderSource boundDirective, {
     @required int nodeIndex,
     @required int queryIndex,
-  }) : super._base(metadata, queryRoot, boundField) {
+  }) : super._base(metadata, queryRoot, boundDirective) {
     _storage = storage;
     _dirtyField = _createQueryDirtyField(
       metadata: metadata,
@@ -528,8 +405,9 @@ class _ListCompileQuery extends CompileQuery {
       }
       result = _createUpdatesStaticOnly(queryValueExpressions);
     }
-
-    return [_boundField.prop(metadata.propertyName).set(result).toStmt()];
+    return [
+      _boundDirective.build().prop(metadata.propertyName).set(result).toStmt()
+    ];
   }
 
   // Only static elements are the result of the query.

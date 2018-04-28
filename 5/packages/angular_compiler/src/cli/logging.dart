@@ -74,7 +74,7 @@ class BuildError extends Error {
   @override
   final Trace stackTrace;
 
-  BuildError(this.message, [Trace trace])
+  BuildError([this.message, Trace trace])
       : stackTrace = trace ?? new Trace.current();
 
   // TODO: Remove internal API once ElementAnnotation has source information.
@@ -133,6 +133,15 @@ class BuildError extends Error {
   @override
   String toString() => message;
 }
+
+/// Logs a fine-level [message].
+///
+/// Messages do not have an impact on the build, and most build systems will not
+/// display by default, and need to opt-in to higher verbosity in order to see
+/// the message.
+///
+/// These are closer to debug-only messages.
+void logFine(String message) => build.log.fine(message);
 
 /// Logs a notice-level [message].
 ///

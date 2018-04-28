@@ -8,7 +8,7 @@ import 'micro/parser.dart';
 
 export 'micro/ast.dart' show NgMicroAst;
 
-final _isBind = new RegExp(r'\S+:');
+final _isBind = new RegExp(r'\S+[:;]');
 
 /// Returns whether [expression] is a special Angular *-star expression.
 ///
@@ -21,8 +21,12 @@ bool isMicroExpression(String expression) =>
 
 /// Returns a de-sugared micro AST from [expression].
 NgMicroAst parseMicroExpression(
-        String directive, String expression, int expressionOffset,
-        {String sourceUrl, TemplateAst origin}) =>
+  String directive,
+  String expression,
+  int expressionOffset, {
+  String sourceUrl,
+  TemplateAst origin,
+}) =>
     const NgMicroParser().parse(
       directive,
       expression,

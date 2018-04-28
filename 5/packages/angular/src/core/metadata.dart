@@ -404,115 +404,6 @@ class Attribute {
   const Attribute(this.attributeName);
 }
 
-/// Declares an injectable parameter to be a live list of directives or variable
-/// bindings from the content children of a directive.
-///
-/// ### Example
-///
-/// Assume that `<tabs>` component would like to get a list its children
-/// `<pane>` components as shown in this example:
-///
-/// ```html
-/// <tabs>
-///   <pane title="Overview">...</pane>
-///   <pane *ngFor="let o of objects" [title]="o.title">{{o.text}}</pane>
-/// </tabs>
-/// ```
-///
-/// The preferred solution is to query for `Pane` directives using this
-/// decorator.
-///
-/// ```dart
-/// @Component(selector: 'pane')
-/// class Pane {
-///   @Input();
-///   String title;
-/// }
-///
-/// @Component(
-///  selector: 'tabs',
-///  template: '''
-///    <ul>
-///      <li *ngFor="let pane of panes">{{pane.title}}</li>
-///    </ul>
-///    <ng-content></ng-content>
-///  ''')
-/// class Tabs {
-///   final QueryList<Pane> panes;
-///
-///   Tabs(@Query(Pane) this.panes);
-/// }
-/// ```
-///
-/// A query can look for variable bindings by passing in a string with desired
-/// binding symbol.
-///
-/// ### Example
-///
-/// ```html
-/// <seeker>
-///   <div #findme>...</div>
-/// </seeker>
-/// ```
-///
-/// ```dart
-/// @Component(selector: 'seeker')
-/// class Seeker {
-///   Seeker(@Query('findme') QueryList<ElementRef> elements) {...}
-/// }
-/// ```
-///
-/// In this case the object that is injected depend on the type of the variable
-/// binding. It can be an ElementRef, a directive or a component.
-///
-/// Passing in a comma separated list of variable bindings will query for all of
-/// them.
-///
-/// ```html
-/// <seeker>
-///   <div #find-me>...</div>
-///   <div #find-me-too>...</div>
-/// </seeker>
-/// ```
-///
-/// ```dart
-///  @Component(selector: 'seeker')
-/// class Seeker {
-///   Seeker(@Query('findMe, findMeToo') QueryList<ElementRef> elements) {...}
-/// }
-/// ```
-///
-/// Configure whether query looks for direct children or all descendants of the
-/// querying element, by using the `descendants` parameter.  It is set to
-/// `false` by default.
-///
-/// ## Example
-///
-/// ```html
-/// <container #first>
-///   <item>a</item>
-///   <item>b</item>
-///   <container #second>
-///     <item>c</item>
-///   </container>
-/// </container>
-/// ```
-///
-/// When querying for items, the first container will see only `a` and `b` by
-/// default, but with `Query(TextDirective, {descendants: true})` it will see
-/// `c` too.
-///
-/// The queried directives are kept in a depth-first pre-order with respect to
-/// their positions in the DOM.
-///
-/// Query does not look deep into any subcomponent views.
-///
-/// Query is updated as part of the change-detection cycle. Since change
-/// detection happens after construction of a directive, QueryList will always
-/// be empty when observed in the constructor.
-///
-/// The injected object is an unmodifiable live list. See [QueryList] for more
-/// details.
 abstract class _Query {
   /// Either the class [Type] or selector [String].
   final Object selector;
@@ -594,41 +485,6 @@ class ContentChild extends _Query {
         );
 }
 
-/// Similar to [Query], but querying the component view, instead of the
-/// content children.
-///
-/// ### Example
-///
-/// ```dart
-/// @Component(
-///   selector: 'my-component',
-///   template: '''
-///     <template [ngIf]="shouldShow">
-///       <item> a </item>
-///       <item> b </item>
-///       <item> c </item>
-///     </template>
-///   '''
-/// )
-/// class MyComponent {
-///   boolean shouldShow;
-///
-///   MyComponent(@ViewQuery(Item) QueryList<Item> items) {
-///     items.changes.listen((_) => print(items.length));
-///   }
-/// }
-/// ```
-///
-/// Supports the same querying parameters as [Query], except
-/// `descendants`. This always queries the whole view.
-///
-/// As `shouldShow` is flipped between true and false, items will contain zero
-/// or three items.
-///
-/// Specifies that a [QueryList] should be injected.
-///
-/// The injected object is an iterable and observable live list.  See
-/// [QueryList] for more details.
 abstract class _ViewQuery extends _Query {
   const _ViewQuery(
     Object selector, {
@@ -714,7 +570,7 @@ abstract class _ViewQuery extends _Query {
 ///   directives: const [ChildCmp])
 /// class SomeCmp implements AfterViewInit {
 ///   @ViewChildren('child1, child2, child3')
-///   QueryList<ChildCmp> children;
+///   List<ChildCmp> children;
 ///
 ///   @override
 ///   ngAfterViewInit() {
@@ -980,35 +836,36 @@ class HostBinding {
   const HostBinding([this.hostPropertyName]);
 }
 
-/// Declares a host listener.
+/// Declares listening to [eventName] on the host element of the directive.
 ///
-/// The decorated method is invoked when the host element emits the specified
-/// event.
-///
-/// If the decorated method returns [false], then [preventDefault] is applied
-/// on the DOM event.
-///
-/// ### Example
-///
-/// The following example declares a directive that attaches a click listener to
-/// the button and counts clicks.
+/// This annotation is valid on _instance_ methods of a class annotated with
+/// either `@Directive` or `@Component`, and is inherited when a class
+/// implements, extends, or mixes-in a class with this annotation.
 ///
 /// ```dart
-/// @Directive(selector: 'button[counting]'')
-/// class CountClicks {
-///   int numberOfClicks = 0;
-///
-///   @HostListener('click', const [r'$event.target'])
-///   void onClick(btn) {
-///     print("Button $btn, number of clicks: ${numberOfClicks++}.");
-///   }
-/// }
-///
 /// @Component(
-///   selector: 'app',
-///   template: '<button counting>Increment</button>',
-///   directives: const [CountClicks])
-/// class App {}
+///   selector: 'button-like',
+///   template: 'CLICK ME',
+/// )
+/// class ButtonLikeComponent {
+///   @HostListener('click')
+///   void onClick() {}
+/// }
+/// ```
+///
+/// An optional second argument, [args], can define arguments to invoke the
+/// method with, including a magic argument `'\$event'`, which is replaced with
+/// the value of the event stream. In most cases [args] can be inferred when
+/// bound to a method with a single argument:
+/// ```dart
+/// @Component(
+///   selector: 'button-like',
+///   template: 'CLICK ME',
+/// )
+/// class ButtonLikeComponent {
+///   @HostListener('click') // == @HostListener('click', const ['\$event'])
+///   void onClick(MouseEvent e) {}
+/// }
 /// ```
 class HostListener {
   final String eventName;

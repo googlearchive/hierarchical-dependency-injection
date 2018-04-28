@@ -42,6 +42,11 @@ abstract class AssetNode {
   /// at this moment in time.
   bool get isReadable => true;
 
+  /// Whether the node is deleted.
+  ///
+  /// Deleted nodes are ignored in the final merge step and watch handlers.
+  bool isDeleted = false;
+
   /// Whether or not this node can be used as a primary input.
   ///
   /// Some nodes are valid primary inputs but are not readable (see
@@ -145,6 +150,9 @@ class GeneratedAssetNode extends AssetNode {
   /// the previous run, indicating that the previous output is still valid.
   Digest previousInputsDigest;
 
+  /// Whether the action which did or would produce this node failed.
+  bool isFailure;
+
   /// The [AssetId] of the node representing the [BuilderOptions] used to create
   /// this node.
   final AssetId builderOptionsId;
@@ -162,6 +170,7 @@ class GeneratedAssetNode extends AssetNode {
     @required this.state,
     @required this.phaseNumber,
     @required this.wasOutput,
+    @required this.isFailure,
     @required this.primaryInput,
     @required this.builderOptionsId,
   })  : this.globs = globs ?? new Set<Glob>(),
@@ -178,7 +187,7 @@ class GeneratedAssetNode extends AssetNode {
 /// A node which is not a generated or source asset.
 ///
 /// These are typically not readable or valid as inputs.
-abstract class SyntheticAssetNode implements AssetNode {
+abstract class _SyntheticAssetNode implements AssetNode {
   @override
   bool get isReadable => false;
 
@@ -186,22 +195,22 @@ abstract class SyntheticAssetNode implements AssetNode {
   bool get isValidInput => false;
 }
 
-/// A [SyntheticAssetNode] representing a non-existent source.
+/// A [_SyntheticAssetNode] representing a non-existent source.
 ///
 /// Typically these are created as a result of `canRead` calls for assets that
 /// don't exist in the graph. We still need to set up proper dependencies so
 /// that if that asset gets added later the outputs are properly invalidated.
-class SyntheticSourceAssetNode extends AssetNode with SyntheticAssetNode {
+class SyntheticSourceAssetNode extends AssetNode with _SyntheticAssetNode {
   SyntheticSourceAssetNode(AssetId id) : super._forMixins(id);
 }
 
-/// A [SyntheticAssetNode] which represents an individual [BuilderOptions]
+/// A [_SyntheticAssetNode] which represents an individual [BuilderOptions]
 /// object.
 ///
 /// These are used to track the state of a [BuilderOptions] object, and all
 /// [GeneratedAssetNode]s should depend on one of these nodes, which represents
 /// their configuration.
-class BuilderOptionsAssetNode extends AssetNode with SyntheticAssetNode {
+class BuilderOptionsAssetNode extends AssetNode with _SyntheticAssetNode {
   BuilderOptionsAssetNode(AssetId id, Digest lastKnownDigest)
       : super._forMixinsWithDigest(id, lastKnownDigest);
 
@@ -211,7 +220,7 @@ class BuilderOptionsAssetNode extends AssetNode with SyntheticAssetNode {
 
 /// Placeholder assets are magic files that are usable as inputs but are not
 /// readable.
-class PlaceHolderAssetNode extends AssetNode with SyntheticAssetNode {
+class PlaceHolderAssetNode extends AssetNode with _SyntheticAssetNode {
   @override
   bool get isValidInput => true;
 
@@ -221,12 +230,12 @@ class PlaceHolderAssetNode extends AssetNode with SyntheticAssetNode {
   String toString() => 'PlaceHolderAssetNode: $id';
 }
 
-/// A [SyntheticAssetNode] which is created for each [primaryInput] to a
+/// A [_SyntheticAssetNode] which is created for each [primaryInput] to a
 /// [PostBuildAction].
 ///
 /// The [outputs] of this node are the individual outputs created for the
 /// [primaryInput] during the [PostBuildAction] at index [actionNumber].
-class PostProcessAnchorNode extends AssetNode with SyntheticAssetNode {
+class PostProcessAnchorNode extends AssetNode with _SyntheticAssetNode {
   final int actionNumber;
   final AssetId builderOptionsId;
   final AssetId primaryInput;
